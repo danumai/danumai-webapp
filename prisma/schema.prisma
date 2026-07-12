@@ -1,0 +1,101 @@
+// Prisma schema for the Danumai site. Models map onto the existing Postgres
+// tables (snake_case columns) that used to be created at runtime by lib/db.ts,
+// so this is a drop-in over any already-seeded database. Apply changes with
+// `npx prisma db push` (or `prisma migrate` if you prefer migrations).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Project {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug        String   @unique
+  name        String
+  tagline     String   @default("")
+  description String   @default("")
+  status      String   @default("")
+  features    Json     @default("[]")
+  accent      String   @default("#d99a4e")
+  imageUrl    String?  @map("image_url")
+  published   Boolean  @default(true)
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("projects")
+}
+
+model Job {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug      String   @unique
+  title     String
+  team      String   @default("")
+  location  String   @default("")
+  type      String   @default("")
+  summary   String   @default("")
+  points    Json     @default("[]")
+  published Boolean  @default(true)
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("jobs")
+}
+
+model SiteContent {
+  key       String   @id
+  value     Json     @default("{}")
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("site_content")
+}
+
+model Application {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  jobTitle  String   @default("") @map("job_title")
+  name      String
+  email     String
+  portfolio String   @default("")
+  note      String   @default("")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("applications")
+}
+
+model ContactMessage {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  email     String
+  topic     String   @default("General")
+  message   String   @default("")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("contact_messages")
+}
+
+model Story {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug         String   @unique
+  title        String
+  subtitle     String   @default("")
+  category     String   @default("Vision")
+  excerpt      String   @default("")
+  body         String   @default("")
+  coverUrl     String?  @map("cover_url")
+  accent       String   @default("#d99a4e")
+  readMinutes  Int      @default(0) @map("read_minutes")
+  published    Boolean  @default(true)
+  publishedAt  DateTime @default(now()) @map("published_at") @db.Timestamptz(6)
+  sortOrder    Int      @default(0) @map("sort_order")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("stories")
+}

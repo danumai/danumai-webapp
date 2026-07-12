@@ -1,0 +1,1170 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Utilities resolve to the app tokens defined in :root below. */
+  --color-ink: var(--app-ink);
+  --color-ink-2: var(--app-ink-2);
+  --color-ink-3: var(--app-ink-3);
+  --color-surface: var(--app-surface);
+  --color-surface-2: var(--app-surface-2);
+  --color-paper: var(--app-paper);
+  --color-mist: var(--app-mist);
+  --color-faint: var(--app-faint);
+
+  --color-copper: var(--app-copper);
+  --color-copper-soft: var(--app-copper-soft);
+  --color-copper-deep: var(--app-copper-deep);
+  --color-nav-bubble: var(--app-nav-bubble);
+
+  --color-terracotta: var(--app-terracotta);
+  --color-sage: var(--app-sage);
+  --color-azure: var(--app-azure);
+
+  --color-hairline: var(--app-hairline);
+  --color-hairline-strong: var(--app-hairline-strong);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-fraunces);
+}
+
+/* ============================ THEME TOKENS ============================
+   LIGHT — "Daylight Studio": a cool, luminous premium daylight, and the
+   site's only theme. Everything is built on three ideas:
+
+     1. The canvas is COOL PORCELAIN (#e7eaf1) — a real blue-grey, not
+        white. White cards then lift off it with obvious separation, so
+        the page never reads as one flat white sheet.
+     2. Type is near-black cool INK (#181920) for crisp, expensive
+        legibility — the single biggest "premium vs. cheap" signal.
+     3. Color comes from LIGHT, not from beige surfaces: an indigo crown
+        overhead, and warm/cool jewel pools in the corners, with each
+        section carrying its own colored wash. Cool neutrals + saturated
+        colored light is the combination that reads as costly.
+
+   Depth ladder (deepest → lightest):
+     canvas  #e7eaf1   the porcelain everything sits on
+     ink/2/3 #e2e6ee → #d1d8e4   recessed pills, chrome, inner tiles
+     surface #f8fafd   LIFTED bright card, floated on layered shadow */
+:root {
+  color-scheme: light;
+
+  /* recessed background bands — cool porcelain → slate, never white */
+  --app-ink: #e2e6ee;
+  --app-ink-2: #dae0ea;
+  --app-ink-3: #d1d8e4;
+  /* lifted panels — bright cool porcelain that reads as an elevated card */
+  --app-surface: #f8fafd;
+  --app-surface-2: #eef2f8;
+  /* foreground — near-black cool ink */
+  --app-paper: #181920;
+  --app-mist: #565b66;
+  --app-faint: #8a909c;
+
+  /* primary accent role → Electric Indigo, flanked by Violet */
+  --app-copper: #4f46e5;
+  --app-copper-soft: #7c3aed;
+  --app-copper-deep: #3730a3;
+  /* nav bubble breaks from the indigo used everywhere else (CTAs, accent
+     words) so the active-section pill reads as its own signal, not a
+     repeat of the primary accent — Signal Coral picks up the warm jewel
+     pool already in the canvas */
+  --app-nav-bubble: #e0402f;
+
+  /* supporting roles → Signal Coral, Studio Teal, Electric Cyan */
+  --app-terracotta: #e0402f;
+  --app-sage: #0d9488;
+  --app-azure: #0e7fb8;
+
+  /* hairlines are cool ink — crisp, so surfaces read as cleanly stacked */
+  --app-hairline: rgba(24, 25, 32, 0.09);
+  --app-hairline-strong: rgba(24, 25, 32, 0.15);
+
+  /* cool porcelain canvas lit from above by a single indigo crown.
+
+     IMPORTANT: the body background scrolls with the page, so any colored
+     region here is pinned to a fixed PAGE position — and a large soft radial
+     fades out along a broad horizontal arc that then cuts straight across
+     whatever section happens to sit at that scroll depth, making content
+     there look stranded in a differently-tinted band (this is exactly what
+     the old corner jewel pools did to mid-Approach). So the canvas is kept
+     to ONE crown at the very top, where only the hero sits and nothing
+     stacks against it. All other daylight color comes from bounded, edge-
+     fading layers that can't band the page: the hero's own .aurora and each
+     act's faint per-section .wash-*. The base stays flat cool porcelain. */
+  --app-body: #e7eaf1;
+  --app-selection: rgba(79, 70, 229, 0.18);
+  --app-grid-line: rgba(24, 25, 32, 0.05);
+  --app-grain-opacity: 0.02;
+
+  /* card treatment — a gentle top-light sheen and, crucially, a LAYERED
+     shadow stack (contact + mid + ambient) so cards float with real depth
+     instead of sitting flat. Hover adds an indigo halo. */
+  --app-card-sheen: rgba(255, 255, 255, 0.7);
+  --app-card-inset: rgba(255, 255, 255, 0.9);
+  --app-card-inset-strong: rgba(255, 255, 255, 1);
+  --app-card-shadow:
+    0 1px 2px rgba(23, 25, 38, 0.05),
+    0 10px 24px -10px rgba(23, 25, 38, 0.12),
+    0 30px 56px -28px rgba(23, 25, 38, 0.16);
+  --app-card-shadow-hover:
+    0 2px 4px rgba(23, 25, 38, 0.06),
+    0 16px 34px -10px rgba(23, 25, 38, 0.16),
+    0 42px 76px -30px rgba(23, 25, 38, 0.2),
+    0 0 50px -14px rgba(79, 70, 229, 0.3);
+  --app-venture-drop: rgba(23, 25, 38, 0.2);
+  --app-field-bg: rgba(24, 25, 32, 0.03);
+  --app-field-bg-focus: rgba(24, 25, 32, 0.05);
+  --app-field-border-hover: rgba(24, 25, 32, 0.22);
+
+  /* interaction light — indigo lead, magenta on the warmest hovers */
+  --app-focus-ring: rgba(79, 70, 229, 0.6);
+  --app-cta-glow: rgba(79, 70, 229, 0.42);
+  --app-cta-glow-hover: rgba(217, 54, 127, 0.48);
+  --app-card-border-hover: rgba(79, 70, 229, 0.35);
+  --app-topline: rgba(79, 70, 229, 0.5);
+  --app-cursor-glow: rgba(79, 70, 229, 0.08);
+  --app-field-focus-border: rgba(79, 70, 229, 0.5);
+  --app-field-focus-ring: rgba(79, 70, 229, 0.12);
+  --app-pulse: rgba(217, 54, 127, 0.4);
+  --app-hero-glow-a: rgba(79, 70, 229, 0.16);
+  --app-hero-glow-b: rgba(217, 54, 127, 0.1);
+
+  /* the violet wash already lights the manifesto, so this stays off —
+     no second color layer competing with it */
+  --app-ambient-glow: transparent;
+}
+
+html {
+  scroll-behavior: auto; /* Lenis owns scrolling */
+}
+
+body {
+  background: var(--app-body);
+  color: var(--app-paper);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--app-selection);
+  color: var(--app-paper);
+}
+
+/* ---- film grain ---- */
+.grain::before {
+  content: "";
+  position: fixed;
+  inset: -100%;
+  z-index: 200;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: var(--app-grain-opacity);
+  animation: grain-shift 9s steps(6) infinite;
+}
+
+@keyframes grain-shift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-2%, 1%);
+  }
+  40% {
+    transform: translate(1%, -2%);
+  }
+  60% {
+    transform: translate(-1%, 2%);
+  }
+  80% {
+    transform: translate(2%, -1%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain::before {
+    animation: none;
+  }
+}
+
+/* ---- hairline utility ---- */
+.hairline {
+  border-color: var(--color-hairline);
+}
+
+/* ---- section divider edge ----
+   Full-width rules between page sections read as hard gray lines on the
+   porcelain canvas, so they stay fully transparent and the sections flow
+   into one another. Pair with Tailwind's border-t / border-y to choose
+   which edges draw. (Component borders keep using .hairline.) */
+.section-edge {
+  border-color: transparent;
+}
+
+/* ---- full-bleed section band ----
+   Transparent — a flat solid block here would sit at a hard, different
+   shade from the neighboring transparent/wash sections and read as a seam.
+   Staying transparent lets the shared canvas + that section's own wash
+   show through, so every section transitions the same way. */
+.section-band {
+  background-color: transparent;
+}
+/* ---- section color washes ----
+   Each act carries ONE dominant hue — a single soft glow, not multiple
+   overlapping color blobs, so a section never reads as two shades stacked.
+   The wash MUST be centered vertically (at 50%) and reach full transparency
+   before the radius spans half the height, so the glow dies out before it
+   touches the top or bottom edge. A wash that is still colored at its own
+   top/bottom edge paints a hard horizontal line where the section meets its
+   neighbor — the "section split into two shades" seam. Horizontal position
+   varies per act for character; vertical stays centered so stacked sections
+   never band.
+
+   Held deliberately faint (~0.04) and faded EARLY (transparent by ~46%) so
+   each act's hue is a small contained pool near its own center — never a
+   band that reaches the section edge or leaks into the neighbor. With no
+   solid section fills, the washes are the only per-section color, so
+   keeping them a whisper is what lets the whole page read as one cool
+   porcelain canvas instead of a stack of differently-tinted blocks. */
+/* Each wash also BREATHES. Critical constraint: these classes live on the
+   content-bearing <section> itself, so animating the element's `opacity`
+   would fade the text and cards too. Instead each act keyframes only its own
+   background-image — structurally identical gradients (same shape, position,
+   radius; only the color-stop alpha changes) interpolate smoothly, so the hue
+   swells and settles while position + radius stay pinned. The "centered,
+   fades early, never touches an edge" guarantee is therefore untouched and no
+   seam can appear. Staggered durations keep neighboring acts out of lockstep. */
+.wash-indigo {
+  background-image: radial-gradient(
+    100% 66% at 30% 50%,
+    rgba(67, 64, 189, 0.04),
+    transparent 46%
+  );
+  animation: wash-indigo-breathe 18s ease-in-out infinite;
+}
+.wash-gold {
+  background-image: radial-gradient(
+    100% 66% at 70% 50%,
+    rgba(217, 143, 31, 0.042),
+    transparent 46%
+  );
+  animation: wash-gold-breathe 21s ease-in-out -4s infinite;
+}
+.wash-cyan {
+  background-image: radial-gradient(
+    100% 66% at 25% 50%,
+    rgba(9, 149, 198, 0.04),
+    transparent 46%
+  );
+  animation: wash-cyan-breathe 24s ease-in-out -8s infinite;
+}
+.wash-emerald {
+  background-image: radial-gradient(
+    100% 66% at 75% 50%,
+    rgba(16, 157, 114, 0.04),
+    transparent 46%
+  );
+  animation: wash-emerald-breathe 20s ease-in-out -6s infinite;
+}
+.wash-violet {
+  background-image: radial-gradient(
+    100% 66% at 50% 50%,
+    rgba(109, 40, 217, 0.036),
+    transparent 46%
+  );
+  animation: wash-violet-breathe 23s ease-in-out -11s infinite;
+}
+.wash-coral {
+  background-image: radial-gradient(
+    100% 66% at 35% 50%,
+    rgba(239, 86, 72, 0.036),
+    transparent 46%
+  );
+  animation: wash-coral-breathe 19s ease-in-out -3s infinite;
+}
+@keyframes wash-indigo-breathe {
+  0%, 100% { background-image: radial-gradient(100% 66% at 30% 50%, rgba(67, 64, 189, 0.03), transparent 46%); }
+  50% { background-image: radial-gradient(100% 66% at 30% 50%, rgba(67, 64, 189, 0.058), transparent 46%); }
+}
+@keyframes wash-gold-breathe {
+  0%, 100% { background-image: radial-gradient(100% 66% at 70% 50%, rgba(217, 143, 31, 0.032), transparent 46%); }
+  50% { background-image: radial-gradient(100% 66% at 70% 50%, rgba(217, 143, 31, 0.06), transparent 46%); }
+}
+@keyframes wash-cyan-breathe {
+  0%, 100% { background-image: radial-gradient(100% 66% at 25% 50%, rgba(9, 149, 198, 0.03), transparent 46%); }
+  50% { background-image: radial-gradient(100% 66% at 25% 50%, rgba(9, 149, 198, 0.056), transparent 46%); }
+}
+@keyframes wash-emerald-breathe {
+  0%, 100% { background-image: radial-gradient(100% 66% at 75% 50%, rgba(16, 157, 114, 0.03), transparent 46%); }
+  50% { background-image: radial-gradient(100% 66% at 75% 50%, rgba(16, 157, 114, 0.056), transparent 46%); }
+}
+@keyframes wash-violet-breathe {
+  0%, 100% { background-image: radial-gradient(100% 66% at 50% 50%, rgba(109, 40, 217, 0.026), transparent 46%); }
+  50% { background-image: radial-gradient(100% 66% at 50% 50%, rgba(109, 40, 217, 0.052), transparent 46%); }
+}
+@keyframes wash-coral-breathe {
+  0%, 100% { background-image: radial-gradient(100% 66% at 35% 50%, rgba(239, 86, 72, 0.026), transparent 46%); }
+  50% { background-image: radial-gradient(100% 66% at 35% 50%, rgba(239, 86, 72, 0.052), transparent 46%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wash-indigo,
+  .wash-gold,
+  .wash-cyan,
+  .wash-emerald,
+  .wash-violet,
+  .wash-coral {
+    animation: none;
+  }
+}
+
+/* ---- site footer: grounded, premium terminal band ----
+   The footer is the page's last element, so unlike the mid-page sections it
+   carries its OWN opaque surface. That grounds the page and,
+   crucially, caps the body's corner color pools — otherwise the warm/teal
+   radials in --app-body leak a stray tinted strip below the content and read
+   as a phantom extra section. A hairline accent along the top edge, a soft
+   crown glow, and an oversized wordmark watermark give it a lit, finished
+   feel. */
+.site-footer {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: var(--color-ink-2);
+}
+/* thin accent rule that lights the seam where the page meets the footer */
+.site-footer::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--app-topline),
+    transparent
+  );
+}
+/* soft crown glow spilling down from the top edge */
+.site-footer::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 320px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    64% 100% at 50% 0%,
+    var(--app-hero-glow-a),
+    transparent 72%
+  );
+}
+.footer-watermark {
+  position: absolute;
+  left: 50%;
+  bottom: -0.16em;
+  z-index: -1;
+  transform: translateX(-50%);
+  font-family: var(--font-fraunces), serif;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 0.8;
+  white-space: nowrap;
+  font-size: clamp(6rem, 24vw, 19rem);
+  color: color-mix(in srgb, var(--color-paper) 4%, transparent);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---- link underline grow ---- */
+.link-line {
+  position: relative;
+}
+.link-line::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 1px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.link-line:hover::after,
+.link-line:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ---- footer rich links, icons & CTA ---- */
+
+/* nav rows: icon + label, both warm up together on hover */
+.footer-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  transition: color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.footer-nav-link:hover,
+.footer-nav-link:focus-visible {
+  color: var(--color-paper);
+}
+
+/* leading arrow used by venture rows: hidden-ish, then slides in on hover */
+.footer-arrow {
+  flex: none;
+  color: var(--color-copper);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.footer-nav-link:hover .footer-arrow,
+.footer-nav-link:focus-visible .footer-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* contact rows use a persistent framed icon that lifts to copper on hover */
+.footer-ico {
+  display: inline-flex;
+  flex: none;
+  color: var(--color-faint);
+  transition:
+    color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.footer-nav-link:hover .footer-ico,
+.footer-nav-link:focus-visible .footer-ico {
+  color: var(--color-copper);
+  transform: translateY(-1px);
+}
+
+/* social chips */
+.social-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  color: var(--color-mist);
+  border: 1px solid var(--color-hairline);
+  background: color-mix(in srgb, var(--color-paper) 3%, transparent);
+  transition:
+    color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.social-chip:hover,
+.social-chip:focus-visible {
+  color: var(--color-paper);
+  border-color: color-mix(in srgb, var(--color-copper) 50%, transparent);
+  background: color-mix(in srgb, var(--color-copper) 12%, transparent);
+  box-shadow: 0 10px 24px -12px color-mix(in srgb, var(--color-copper) 60%, transparent);
+}
+
+/* ---- focus ring ---- */
+:focus-visible {
+  outline: 2px solid var(--app-focus-ring);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---- button sheen sweep ---- */
+.sheen {
+  position: relative;
+  overflow: hidden;
+}
+.sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.22) 50%,
+    transparent 65%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.sheen:hover::after {
+  transform: translateX(120%);
+}
+
+/* ---- ambient hero glow ---- */
+.hero-glow {
+  background:
+    radial-gradient(
+      60% 50% at 70% 20%,
+      var(--app-hero-glow-a),
+      transparent 70%
+    ),
+    radial-gradient(
+      45% 40% at 20% 80%,
+      var(--app-hero-glow-b),
+      transparent 70%
+    );
+}
+
+/* ---- aurora field: a living, layered jewel-light mesh ----
+   Jewel light drifting behind the hero on the cool porcelain canvas —
+   indigo and violet leading, studio teal and electric cyan cooling the low
+   corners, one warm magenta pool for contrast. Blurred wide and dialed back
+   so the porcelain stays luminous, not muddy.
+
+   Depth is built from THREE stacked planes that move in counterpoint, so the
+   field reads as real drifting weather rather than one panning image:
+     .aurora          — the primary jewel pools, slow drift + gentle breathe
+     .aurora::before  — a larger, slower counter-drifting undertone for depth
+     .aurora::after   — a fine conic specular sheen that slowly revolves,
+                        catching the light like the surface of the glass
+   A whole-field hue rotation runs underneath all three, so the colors living-
+   ly refract over minutes instead of sitting fixed. */
+.aurora {
+  position: absolute;
+  inset: -25%;
+  z-index: 0;
+  pointer-events: none;
+  filter: blur(74px) saturate(155%);
+  opacity: 0.52;
+  background:
+    radial-gradient(
+      32% 42% at 22% 26%,
+      rgba(79, 70, 229, 0.28),
+      transparent 62%
+    ),
+    radial-gradient(
+      28% 38% at 80% 18%,
+      rgba(217, 54, 127, 0.2),
+      transparent 60%
+    ),
+    radial-gradient(
+      38% 46% at 68% 82%,
+      rgba(13, 148, 136, 0.2),
+      transparent 62%
+    ),
+    radial-gradient(
+      30% 34% at 12% 82%,
+      rgba(14, 127, 184, 0.18),
+      transparent 60%
+    ),
+    radial-gradient(
+      26% 32% at 48% 52%,
+      rgba(124, 58, 237, 0.16),
+      transparent 60%
+    );
+  will-change: transform, filter;
+  animation:
+    aurora-drift 26s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate,
+    aurora-hue 60s linear infinite;
+}
+/* undertone plane — wider, deeper pools drifting the opposite way, so the
+   field gains parallax and never reads as a single flat sheet of color */
+.aurora::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  border-radius: inherit;
+  filter: blur(96px) saturate(140%);
+  opacity: 0.85;
+  background:
+    radial-gradient(
+      44% 52% at 78% 40%,
+      rgba(99, 102, 241, 0.22),
+      transparent 64%
+    ),
+    radial-gradient(
+      40% 48% at 18% 60%,
+      rgba(192, 38, 211, 0.16),
+      transparent 62%
+    ),
+    radial-gradient(
+      46% 50% at 52% 92%,
+      rgba(20, 184, 166, 0.16),
+      transparent 64%
+    );
+  animation: aurora-undertow 34s cubic-bezier(0.45, 0, 0.55, 1) infinite
+    alternate;
+}
+/* specular plane — a slowly revolving conic sheen, held to a whisper, that
+   makes the light feel like it is catching a curved glass surface */
+.aurora::after {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  opacity: 0.4;
+  filter: blur(58px);
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    transparent 0deg,
+    rgba(124, 58, 237, 0.14) 70deg,
+    transparent 150deg,
+    rgba(14, 127, 184, 0.12) 240deg,
+    transparent 320deg
+  );
+  animation: aurora-revolve 48s linear infinite;
+}
+@keyframes aurora-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(2.5%, -2%, 0) scale(1.1) rotate(2deg);
+  }
+  100% {
+    transform: translate3d(-2%, 1.5%, 0) scale(1.06) rotate(-1.5deg);
+  }
+}
+@keyframes aurora-undertow {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1.04) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(-3%, 2.5%, 0) scale(1.12) rotate(-2.5deg);
+  }
+  100% {
+    transform: translate3d(2%, -1.5%, 0) scale(1.08) rotate(1.5deg);
+  }
+}
+@keyframes aurora-revolve {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* slow whole-field refraction — the palette breathes through a narrow hue arc
+   so the color is never static, but never swings far enough to leave the
+   brand's indigo→violet→teal register */
+@keyframes aurora-hue {
+  0%,
+  100% {
+    filter: blur(74px) saturate(155%) hue-rotate(-8deg);
+  }
+  50% {
+    filter: blur(74px) saturate(165%) hue-rotate(10deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora,
+  .aurora::before,
+  .aurora::after {
+    animation: none;
+  }
+}
+
+/* ---- fine background grid, faded at the edges ---- */
+.bg-grid {
+  background-image:
+    linear-gradient(var(--app-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--app-grid-line) 1px, transparent 1px);
+  background-size: 62px 62px;
+  -webkit-mask-image: radial-gradient(
+    72% 62% at 50% 42%,
+    #000 0%,
+    transparent 82%
+  );
+  mask-image: radial-gradient(72% 62% at 50% 42%, #000 0%, transparent 82%);
+}
+
+/* ---- accent word: jewel gradient fill for emphasized display words ----
+   Emphasized words refract from electric indigo through violet into rose
+   magenta — a cool-led jewel sweep against the ink. */
+.accent-word {
+  position: relative;
+  font-style: italic;
+  /* italic glyphs lean right and their side-bearing overshoots the
+     inline-block box, so background-clip:text clips the final stroke. A
+     little right padding gives the overhang room; the matching negative
+     margin keeps word spacing unchanged. */
+  padding-right: 0.08em;
+  margin-right: -0.08em;
+  /* a brighter specular band (near-white at 50%) is folded into the jewel
+     sweep so a highlight travels through the letters as the gradient pans —
+     the word reads as lit glass catching light, not a flat gradient fill */
+  background: linear-gradient(
+    115deg,
+    #4f46e5,
+    #7c3aed 22%,
+    #c026d3 40%,
+    #f0e6ff 50%,
+    #d9367f 60%,
+    #7c3aed 80%,
+    #4f46e5
+  );
+  background-size: 260% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* the jewel slowly refracts — a whisper of movement across every emphasized
+     word on the page, so the type feels lit rather than printed. A colored
+     drop-shadow halo breathes in the same rhythm so the word reads as backlit
+     glass. drop-shadow works on the gradient-clipped glyphs regardless of how
+     the word is split into per-character spans. */
+  animation:
+    accent-shimmer 9s cubic-bezier(0.45, 0, 0.55, 1) infinite,
+    accent-glow 9s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes accent-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+@keyframes accent-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 10px rgba(124, 58, 237, 0.12));
+  }
+  50% {
+    filter: drop-shadow(0 1px 22px rgba(192, 38, 211, 0.3));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .accent-word {
+    animation: none;
+  }
+}
+
+/* ---- prism glow for primary CTAs ----
+   Primary CTAs wear the prism itself: an indigo → violet → magenta
+   gradient that outshines any flat fill. The gradient is a
+   background-image, so the button's bg-copper hover states keep working
+   underneath without a flash. */
+.glow-copper {
+  background-image: linear-gradient(
+    135deg,
+    #4f46e5,
+    #7c3aed 30%,
+    #c026d3 55%,
+    #d9367f 72%,
+    #4f46e5
+  );
+  background-size: 220% 100%;
+  background-position: 0% 50%;
+  box-shadow: 0 10px 30px -12px var(--app-cta-glow);
+  transition: box-shadow 0.5s ease, background-position 0.6s ease;
+  /* the prism is never fully still — it drifts slowly at rest so the CTA
+     reads as lit even before the cursor arrives, then accelerates on hover */
+  animation: cta-idle 9s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+.glow-copper:hover {
+  box-shadow: 0 16px 44px -12px var(--app-cta-glow-hover);
+  /* the prism travels across the button on hover — a live sweep of light */
+  animation: cta-pan 2.6s linear infinite;
+}
+@keyframes cta-idle {
+  0% {
+    background-position: 12% 50%;
+  }
+  100% {
+    background-position: 60% 50%;
+  }
+}
+@keyframes cta-pan {
+  to {
+    background-position: 220% 50%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glow-copper {
+    animation: none;
+  }
+}
+
+/* ---- venture feature pill: tactile accent chip ----
+   Base and hover colours both derive from the card's --pill accent (set
+   inline per venture), so the chip lifts and warms toward its own hue on
+   hover instead of staying a flat token. */
+.venture-pill {
+  --pill: currentColor;
+  border-color: color-mix(in srgb, var(--pill) 30%, transparent);
+  background: color-mix(in srgb, var(--pill) 9%, transparent);
+  transition:
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.4s ease,
+    background-color 0.4s ease,
+    color 0.4s ease;
+}
+.venture-pill:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--pill) 58%, transparent);
+  background: color-mix(in srgb, var(--pill) 18%, transparent);
+  color: var(--color-paper);
+}
+
+/* ---- custom cursor: hide the native pointer while active ---- */
+@media (hover: hover) and (pointer: fine) {
+  body.cursor-active,
+  body.cursor-active a,
+  body.cursor-active button,
+  body.cursor-active [role="radio"] {
+    cursor: none;
+  }
+}
+
+/* ---- premium elevated card ----
+   A layered surface: subtle top-lit gradient, a hairline that catches light
+   at the top edge, and a soft drop shadow for depth. Hovering lifts the
+   border toward the accent and deepens the shadow. Cards blend their
+   --card-accent into the surface so a grid reads as a set of tinted
+   panels — indigo, coral, teal, amber — instead of white boxes. Untinted
+   cards (--card-accent left at the surface) stay clean porcelain. */
+.card {
+  /* Per-card accent. Defaults to the plain surface (a no-op mix), so a card
+     stays neutral until a section sets --card-accent to a real hue. */
+  --card-accent: var(--color-surface);
+  position: relative;
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(180deg, var(--app-card-sheen), transparent 52%),
+    linear-gradient(
+      158deg,
+      color-mix(in srgb, var(--card-accent) 22%, var(--color-surface)),
+      color-mix(in srgb, var(--card-accent) 9%, var(--color-surface))
+    );
+  border: 1px solid
+    color-mix(in srgb, var(--card-accent) 30%, var(--color-hairline));
+  box-shadow:
+    0 1px 0 0 var(--app-card-inset) inset,
+    0 1px 2px rgba(23, 25, 38, 0.05),
+    0 10px 24px -10px color-mix(in srgb, var(--card-accent) 40%, rgba(23, 25, 38, 0.12)),
+    0 30px 56px -28px color-mix(in srgb, var(--card-accent) 34%, rgba(23, 25, 38, 0.16));
+  transition:
+    border-color 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.5s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--card-accent) 60%, transparent);
+  box-shadow:
+    0 1px 0 0 var(--app-card-inset-strong) inset,
+    0 2px 4px rgba(23, 25, 38, 0.06),
+    0 16px 34px -10px color-mix(in srgb, var(--card-accent) 46%, rgba(23, 25, 38, 0.16)),
+    0 42px 76px -30px color-mix(in srgb, var(--card-accent) 40%, rgba(23, 25, 38, 0.2));
+}
+/* accent hairline that lights the top edge of a card on hover */
+.card-topline::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--app-topline),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.card-hover:hover.card-topline::before,
+.card-topline.card-hover:hover::before {
+  opacity: 1;
+}
+
+/* ---- frosted glass card ----
+   A softer, calmer alternative to the solid .card: a translucent, blurred
+   pane that frosts whatever sits behind it (the section's breathing wash + the
+   grid), so the tile reads as a sheet of lit glass floating on the canvas
+   rather than an opaque plate. Keeps the same per-accent tint contract
+   (--card-accent) and pairs with .card-hover / .card-topline / .beam. The
+   backdrop-blur is the whole point, so the surface stays deliberately
+   see-through; a bright top sheen + inset highlight give it the wet-glass
+   edge. */
+.card-glass {
+  --card-accent: var(--color-surface);
+  position: relative;
+  border-radius: 1.25rem;
+  /* Bright frosted PANEL — deliberately more opaque than a see-through pane,
+     because the porcelain canvas has nothing to refract, so pure glass would
+     vanish into it. The card sits clearly brighter than the canvas (a frosted
+     near-white tinted a whisper toward its accent); the backdrop-blur still
+     softly refracts the section wash + grid through the translucent parts, so
+     it reads as lit glass rather than a flat plate — but it never disappears. */
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.9),
+      rgba(255, 255, 255, 0.62) 60%
+    ),
+    color-mix(in srgb, var(--card-accent) 14%, rgba(249, 251, 254, 0.86));
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+  /* crisp cool-ink hairline so the edge is legible on the light canvas — a
+     white border here would be invisible */
+  border: 1px solid
+    color-mix(in srgb, var(--card-accent) 30%, var(--color-hairline-strong));
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.95) inset,
+    0 1px 2px rgba(23, 25, 38, 0.06),
+    0 12px 26px -12px color-mix(in srgb, var(--card-accent) 30%, rgba(23, 25, 38, 0.16)),
+    0 30px 56px -28px color-mix(in srgb, var(--card-accent) 26%, rgba(23, 25, 38, 0.2));
+  transition:
+    border-color 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.6s ease;
+}
+.card-hover.card-glass:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--card-accent) 55%, var(--color-hairline-strong));
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 1) inset,
+    0 2px 4px rgba(23, 25, 38, 0.07),
+    0 18px 38px -14px color-mix(in srgb, var(--card-accent) 40%, rgba(23, 25, 38, 0.2)),
+    0 44px 78px -32px color-mix(in srgb, var(--card-accent) 34%, rgba(23, 25, 38, 0.24));
+}
+
+/* ---- service capability chip ----
+   Small pill inside a .card that inherits the card's --card-accent. It sits
+   quietly tinted, then on card hover its fill and border deepen toward the
+   accent and it lifts — so the whole chip cluster brightens as one when the
+   card is engaged. The per-chip transition-delay (set inline) gives the row a
+   staggered ripple. */
+.service-chip {
+  border: 1px solid color-mix(in srgb, var(--card-accent) 24%, transparent);
+  background: color-mix(in srgb, var(--card-accent) 6%, transparent);
+  transition:
+    background 0.5s ease,
+    border-color 0.5s ease,
+    color 0.5s ease,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.group:hover .service-chip {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--card-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--card-accent) 16%, transparent);
+  color: var(--color-paper);
+}
+@media (prefers-reduced-motion: reduce) {
+  .group:hover .service-chip {
+    transform: none;
+  }
+}
+
+/* ---- card cursor glow (uses --mx / --my set from JS) ---- */
+.cursor-glow {
+  background: radial-gradient(
+    280px circle at var(--mx, 50%) var(--my, 50%),
+    var(--app-cursor-glow),
+    transparent 65%
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.group:hover > .cursor-glow {
+  opacity: 1;
+}
+
+/* ---- form fields ---- */
+.field {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-hairline);
+  background: var(--app-field-bg);
+  padding: 0.8rem 1rem;
+  font-size: 0.875rem;
+  color: var(--color-paper);
+  transition:
+    border-color 0.4s ease,
+    box-shadow 0.4s ease,
+    background 0.4s ease;
+}
+.field::placeholder {
+  color: var(--color-faint);
+}
+.field:hover {
+  border-color: var(--app-field-border-hover);
+}
+.field:focus {
+  outline: none;
+  border-color: var(--app-field-focus-border);
+  box-shadow: 0 0 0 4px var(--app-field-focus-ring);
+  background: var(--app-field-bg-focus);
+}
+
+/* ---- ticker marquee ---- */
+.marquee {
+  animation: marquee 36s linear infinite;
+}
+.marquee:hover {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-33.333%);
+  }
+}
+
+/* ---- open-role pulse ---- */
+.pulse-dot {
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 var(--app-pulse);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 0 5px transparent;
+  }
+}
+
+/* ---- fluid display type ----
+   The hero headline is the single loudest typographic moment on the page, so
+   it sizes off the viewport instead of fixed breakpoints — it scales
+   continuously from phone to wide desktop, and the tightened tracking + optical
+   line-height keep it feeling set, not merely large. */
+.text-hero {
+  font-size: clamp(2.5rem, 1.2rem + 6vw, 5.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.022em;
+}
+.text-hero-sub {
+  font-size: clamp(1.75rem, 1rem + 3vw, 3.25rem);
+  line-height: 1.06;
+  letter-spacing: -0.018em;
+}
+
+/* ---- animated conic border beam ----
+   A signature "lit edge" for primary surfaces: a single bright arc of the
+   brand prism sweeps continuously around the border of an element. Built the
+   modern way — a conic gradient painted into a 1px ring via mask compositing,
+   with the sweep angle animated through a registered @property so the browser
+   can interpolate the angle on the compositor (impossible with a plain
+   background-position hack). Defaults to hover-reveal; add `.beam-always` for a
+   permanent halo. Colour + speed are themable per element via custom props. */
+@property --beam-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+.beam {
+  position: relative;
+}
+.beam::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  padding: var(--beam-width, 1px);
+  background: conic-gradient(
+    from var(--beam-angle) at 50% 50%,
+    transparent 0deg,
+    var(--beam-color, #7c3aed) 24deg,
+    var(--beam-color-2, #d9367f) 44deg,
+    transparent 96deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  animation: beam-spin var(--beam-speed, 4.5s) linear infinite;
+  pointer-events: none;
+}
+.beam:hover::after,
+.beam-always::after,
+.group:hover > .beam::after {
+  opacity: 1;
+}
+@keyframes beam-spin {
+  to {
+    --beam-angle: 360deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .beam::after {
+    animation: none;
+  }
+}
+
+/* ---- second marquee lane, reversed ----
+   Pairs with .marquee to form two counter-drifting rows; the offset speeds and
+   opposing directions read as depth rather than one sliding strip. */
+.marquee-rev {
+  animation: marquee-rev 44s linear infinite;
+}
+.marquee-rev:hover,
+.marquee:hover ~ .marquee-rev,
+.group:hover .marquee,
+.group:hover .marquee-rev {
+  animation-play-state: paused;
+}
+@keyframes marquee-rev {
+  from {
+    transform: translateX(-33.333%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* ---- gentle idle float for decorative chips ---- */
+.float {
+  animation: float-bob 7s ease-in-out infinite;
+}
+@keyframes float-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .float,
+  .marquee-rev {
+    animation: none;
+  }
+}
+
+/* ---- oversized ghost numeral ----
+   A giant, barely-there display figure sitting behind a stat — pure typographic
+   depth, keyed to the tile's accent so a grid of stats reads as a set of lit
+   plates rather than flat boxes. */
+.ghost-numeral {
+  font-family: var(--font-fraunces), serif;
+  font-weight: 600;
+  line-height: 0.72;
+  letter-spacing: -0.04em;
+  color: color-mix(in srgb, var(--ghost, var(--color-paper)) 8%, transparent);
+  user-select: none;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
