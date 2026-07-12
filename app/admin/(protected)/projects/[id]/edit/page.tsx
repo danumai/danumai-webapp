@@ -12,7 +12,10 @@ export default async function EditProjectPage({
   const project = await getProject(id);
   if (!project) notFound();
 
-  const boundAction = updateProjectAction.bind(null, project.id, project.imageUrl);
+  const boundAction = updateProjectAction.bind(null, project.id, {
+    imageUrl: project.imageUrl,
+    gallery: project.gallery,
+  });
 
   return (
     <div>

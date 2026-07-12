@@ -200,8 +200,24 @@ export function ImageArt({ imageUrl, name }: { imageUrl: string | null; name: st
     );
   }
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={imageUrl} alt="" className="h-full w-full object-cover" />
+    <div className="relative h-full w-full overflow-hidden">
+      {/* soft blurred fill of the same image, so the whole shot can sit
+          uncropped in front without leaving empty bars around it */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={imageUrl}
+        alt=""
+        aria-hidden
+        className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl"
+      />
+      {/* the full image, never zoomed or cropped */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={imageUrl}
+        alt=""
+        className="relative h-full w-full object-contain"
+      />
+    </div>
   );
 }
 

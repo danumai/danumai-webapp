@@ -71,6 +71,8 @@ export type ServiceCategory = {
   body: string;
   items: string[];
   accent: string;
+  /** Detailed points about the work — revealed as an icon-led list on the card's back face when flipped. */
+  details?: string[];
 };
 export type ServicesContent = {
   eyebrow: string;
@@ -208,6 +210,13 @@ export const DEFAULT_CONTENT: SiteContent = {
           "Royalty-Free Music",
         ],
         accent: "#e0402f",
+        details: [
+          "Story-first editing — pacing, colour, and sound shaped so every frame earns its place",
+          "Punchy social reels through to long-form brand films",
+          "Scripted motion graphics and seamless transitions",
+          "Mastered audio, licensed music, and studio-grade voice over",
+          "Delivered in every aspect ratio your channels demand",
+        ],
       },
       {
         n: "02",
@@ -222,6 +231,13 @@ export const DEFAULT_CONTENT: SiteContent = {
           "Prototype",
         ],
         accent: "#4f46e5",
+        details: [
+          "Design that starts with the problem, not the pixels",
+          "User journeys mapped and hard flows wireframed first",
+          "High-fidelity interfaces with clickable prototypes to test before code ships",
+          "SaaS dashboards, mobile apps, and web products that feel obvious to use",
+          "Design systems that scale as the product grows",
+        ],
       },
       {
         n: "03",
@@ -235,6 +251,13 @@ export const DEFAULT_CONTENT: SiteContent = {
           "Custom Solutions",
         ],
         accent: "#0d9488",
+        details: [
+          "Fast, accessible sites engineered to convert",
+          "Clean code with SEO-ready structure baked in",
+          "Performance budgets that keep pages loading in a blink",
+          "Headless eCommerce, LMS builds, and custom platforms",
+          "Responsive, secure, and handed over ready to scale",
+        ],
       },
       {
         n: "04",
@@ -248,6 +271,13 @@ export const DEFAULT_CONTENT: SiteContent = {
           "Design Solutions",
         ],
         accent: "#d97706",
+        details: [
+          "A brand is a system, not a logo — we design the whole system",
+          "Complete identities: marks, type, colour, and voice",
+          "Guidelines that keep the brand consistent everywhere",
+          "Stationery through to scroll-stopping social templates",
+          "Instantly recognisable across every touchpoint",
+        ],
       },
       {
         n: "05",
@@ -261,6 +291,13 @@ export const DEFAULT_CONTENT: SiteContent = {
           "Google Ranking",
         ],
         accent: "#7c3aed",
+        details: [
+          "Growth you can measure — marketing run like an experiment, not a guess",
+          "Technical SEO and content strategy that climb the rankings",
+          "Paid campaigns across Google and Meta, tuned to your audience",
+          "Funnels optimised against real numbers",
+          "Transparent reporting you can act on",
+        ],
       },
     ],
   },
@@ -474,6 +511,12 @@ export const SECTIONS: SectionSchema[] = [
           { name: "n", label: "Number", type: "text", placeholder: "01" },
           { name: "title", label: "Title", type: "text" },
           { name: "body", label: "Body", type: "textarea" },
+          {
+            name: "details",
+            label: "Detail points",
+            type: "list",
+            help: "Points shown as an icon list on the back of the card when it flips (one per line).",
+          },
           { name: "items", label: "Offerings", type: "list" },
           { name: "accent", label: "Accent", type: "color" },
         ],

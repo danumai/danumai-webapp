@@ -11,7 +11,9 @@ export type Project = {
   status: string;
   features: string[];
   accent: string;
+  techStack: string[];
   imageUrl: string | null;
+  gallery: string[];
   published: boolean;
   sortOrder: number;
 };
@@ -26,7 +28,9 @@ function mapRow(row: ProjectModel): Project {
     status: row.status,
     features: (row.features as string[]) ?? [],
     accent: row.accent,
+    techStack: (row.techStack as string[]) ?? [],
     imageUrl: row.imageUrl,
+    gallery: (row.gallery as string[]) ?? [],
     published: row.published,
     sortOrder: row.sortOrder,
   };
@@ -45,6 +49,11 @@ export async function getProject(id: string): Promise<Project | null> {
   return row ? mapRow(row) : null;
 }
 
+export async function getProjectBySlug(slug: string): Promise<Project | null> {
+  const row = await prisma.project.findUnique({ where: { slug } });
+  return row ? mapRow(row) : null;
+}
+
 export type ProjectInput = {
   slug: string;
   name: string;
@@ -53,7 +62,9 @@ export type ProjectInput = {
   status: string;
   features: string[];
   accent: string;
+  techStack: string[];
   imageUrl: string | null;
+  gallery: string[];
   published: boolean;
   sortOrder: number;
 };

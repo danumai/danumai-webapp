@@ -736,6 +736,175 @@ body {
   }
 }
 
+/* ---- brand mark: the living gradient tile + hover cinema reveal ----
+   The in-page Danumai mark (components/Logo.tsx) is a gradient "roof" tile with
+   a white "D" and a coral signal dot. On hover of the wrapping .group (the Nav
+   wordmark link) it zooms and the D gives way to a celebrating cinema
+   clapperboard — a nod to Danumai's streaming / Studios roots: the board pops
+   in with a spring, the clapstick snaps shut ("action!"), a flash blooms and
+   sparkles twinkle. Geometry origins are pinned in view-box units so nesting
+   can't drift the hinge. All motion honours prefers-reduced-motion. */
+
+/* the tile's light lives even at rest — a slow specular sweep across the glass */
+.danu-shine {
+  animation: danu-shine 7.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes danu-shine {
+  0% {
+    transform: translateX(-64px);
+  }
+  55%,
+  100% {
+    transform: translateX(64px);
+  }
+}
+
+/* D <-> cinema crossfade — the board springs in with a little overshoot */
+.danu-d,
+.danu-cine {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.danu-d {
+  transition:
+    opacity 0.35s ease,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.danu-cine {
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 0.4s ease,
+    transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.group:hover .danu-d,
+.group:focus-visible .danu-d {
+  opacity: 0;
+  transform: scale(0.35);
+}
+.group:hover .danu-cine,
+.group:focus-visible .danu-cine {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* the clapstick hinges at its lower-left corner and snaps shut on reveal */
+.danu-clap {
+  transform-box: view-box;
+  transform-origin: 30px 49.5px;
+}
+.group:hover .danu-clap,
+.group:focus-visible .danu-clap {
+  animation: danu-clap 0.66s cubic-bezier(0.34, 1.56, 0.64, 1) 0.14s both;
+}
+@keyframes danu-clap {
+  0% {
+    transform: rotate(-30deg);
+  }
+  60% {
+    transform: rotate(6deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* a white flash blooms the instant the clapstick meets the slate */
+.danu-flash {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.2);
+}
+.group:hover .danu-flash,
+.group:focus-visible .danu-flash {
+  animation: danu-flash 0.6s ease-out 0.52s both;
+}
+@keyframes danu-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  28% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.1);
+  }
+}
+
+/* sparkles pop in with a springy overshoot, then keep twinkling while hovered */
+.danu-spark {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.group:hover .danu-spark,
+.group:focus-visible .danu-spark {
+  animation:
+    danu-spark-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+    danu-twinkle 1.7s ease-in-out 0.5s infinite;
+}
+.group:hover .danu-spark.s2,
+.group:focus-visible .danu-spark.s2 {
+  animation-delay: 0.16s;
+}
+.group:hover .danu-spark.s3,
+.group:focus-visible .danu-spark.s3 {
+  animation-delay: 0.28s;
+}
+.group:hover .danu-spark.s4,
+.group:focus-visible .danu-spark.s4 {
+  animation-delay: 0.4s;
+}
+@keyframes danu-spark-in {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-40deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.15) rotate(6deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+@keyframes danu-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.72);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .danu-shine {
+    animation: none;
+    opacity: 0;
+  }
+  .group:hover .danu-clap,
+  .group:focus-visible .danu-clap {
+    animation: none;
+    transform: rotate(0deg);
+  }
+  .group:hover .danu-flash,
+  .group:focus-visible .danu-flash {
+    animation: none;
+  }
+  .group:hover .danu-spark,
+  .group:focus-visible .danu-spark {
+    animation: none;
+    opacity: 0.9;
+  }
+}
+
 /* ---- prism glow for primary CTAs ----
    Primary CTAs wear the prism itself: an indigo → violet → magenta
    gradient that outshines any flat fill. The gradient is a
@@ -953,6 +1122,104 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .group:hover .service-chip {
     transform: none;
+  }
+}
+
+/* ---- flip card ----
+   A service card that turns on click to reveal a detailed description on its
+   back face. The container establishes perspective; the inner element carries
+   the 3D rotation with both faces stacked in the same grid cell, so the
+   container sizes to the taller face and there is no absolute-position height
+   guesswork. Each face keeps backface-visibility hidden so only the one facing
+   the viewer paints. */
+.flip {
+  /* a closer vanishing point makes the turn read as a real object rotating in
+     space rather than a flat card fading over — the whole point of the effect */
+  perspective: 1200px;
+  height: 100%;
+}
+.flip-inner {
+  position: relative;
+  display: grid;
+  height: 100%;
+  transform-style: preserve-3d;
+  /* symmetric ease-in-out so the turn accelerates then settles evenly */
+  transition: transform 0.7s cubic-bezier(0.645, 0.045, 0.355, 1);
+  will-change: transform;
+}
+.flip.is-flipped .flip-inner {
+  transform: rotateY(180deg);
+}
+.flip-face {
+  grid-area: 1 / 1;
+  min-width: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.flip-back {
+  transform: rotateY(180deg);
+}
+/* Both faces share one grid cell, so the face turned away is still geometrically
+   on top and would otherwise swallow hover/click from the visible face — which
+   silently kills the front card's hover lift, beam, glow and chip ripple. Route
+   pointer events to whichever face is showing so every original animation fires. */
+.flip-back {
+  pointer-events: none;
+}
+.flip.is-flipped .flip-front {
+  pointer-events: none;
+}
+.flip.is-flipped .flip-back {
+  pointer-events: auto;
+}
+/* Small circular check badge on the card's back face — tinted to the card
+   accent (same contract as .service-chip) so each card's detail list carries
+   its own hue. */
+.detail-badge {
+  color: var(--card-accent);
+  border: 1px solid color-mix(in srgb, var(--card-accent) 35%, transparent);
+  background: color-mix(in srgb, var(--card-accent) 12%, transparent);
+}
+
+/* The flip affordance: a quiet pill that warms toward the card accent on hover.
+   NOTE: no transform on the button itself — the button must not rotate/scale;
+   only its arrow icon nudges. */
+.flip-toggle {
+  transition:
+    background 0.4s ease,
+    border-color 0.4s ease,
+    color 0.4s ease;
+}
+.flip-toggle:hover {
+  border-color: color-mix(in srgb, var(--card-accent) 70%, transparent);
+  background: color-mix(in srgb, var(--card-accent) 18%, transparent);
+  color: var(--color-paper);
+}
+.flip-toggle-icon {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* back arrow points the other way (left) — rotated here, in the same transform
+   property the hover nudge uses, so the two never fight */
+.flip-toggle-icon--back {
+  transform: rotate(180deg);
+}
+/* on hover each arrow slides a hair in the direction it points */
+.flip-toggle:hover .flip-toggle-icon {
+  transform: translateX(3px);
+}
+.flip-toggle:hover .flip-toggle-icon--back {
+  transform: rotate(180deg) translateX(3px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .flip-inner {
+    transition: none;
+  }
+  .flip-toggle:hover .flip-toggle-icon {
+    transform: none;
+  }
+  .flip-toggle:hover .flip-toggle-icon--back,
+  .flip-toggle-icon--back {
+    transform: rotate(180deg);
   }
 }
 

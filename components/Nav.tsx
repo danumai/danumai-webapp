@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import MagneticButton from '@/components/ui/MagneticButton';
+import Logo from '@/components/Logo';
 
 const links = [
   { href: '/#ventures', label: 'Ventures' },
@@ -129,11 +130,18 @@ export default function Nav() {
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5 md:px-10">
         <Link
           href="/"
-          className="group font-display text-lg tracking-tight text-paper"
+          className="group flex items-center gap-2.5 font-display text-lg tracking-tight text-paper"
         >
-          Danumai 
-          <span className="inline-block text-copper transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-150 ml-1.5">
-            Inc.
+          <Logo
+            interactive
+            size={30}
+            className="origin-center transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110"
+          />
+          <span className="flex items-baseline">
+            Danumai
+            <span className="inline-block text-copper transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-150 ml-1.5">
+              Inc.
+            </span>
           </span>
         </Link>
 
@@ -219,9 +227,24 @@ export default function Nav() {
 
           <MagneticButton
             href="/contact"
-            className="sheen hidden rounded-full border hairline px-5 py-2 text-sm text-paper transition-colors hover:border-copper/40 hover:text-copper-soft md:inline-block"
+            strength={0.15}
+            className="glow-copper sheen beam beam-always group hidden items-center gap-1.5 rounded-full bg-copper px-5 py-2 text-sm font-medium text-ink transition-[background-color,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-copper-soft md:inline-flex"
           >
             Get in touch
+            <svg
+              viewBox="0 0 16 16"
+              fill="none"
+              aria-hidden
+              className="h-3.5 w-3.5 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            >
+              <path
+                d="M4.5 11.5 11.5 4.5M6.5 4.5h5v5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </MagneticButton>
 
           {/* Mobile menu toggle */}
@@ -284,9 +307,23 @@ export default function Nav() {
                 <Link
                   href="/contact"
                   onClick={() => setMenuOpen(false)}
-                  className="sheen inline-block rounded-full border hairline px-5 py-2.5 text-sm text-paper transition-colors hover:border-copper/40 hover:text-copper-soft"
+                  className="glow-copper sheen group inline-flex items-center gap-1.5 rounded-full bg-copper px-5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-copper-soft"
                 >
                   Get in touch
+                  <svg
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    aria-hidden
+                    className="h-3.5 w-3.5 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  >
+                    <path
+                      d="M4.5 11.5 11.5 4.5M6.5 4.5h5v5"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                 </Link>
               </li>
             </ul>

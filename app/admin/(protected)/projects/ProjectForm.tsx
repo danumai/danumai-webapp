@@ -1,8 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import type { Project } from "@/lib/data/projects";
 import type { ProjectFormState } from "./actions";
+import { ImageArt } from "@/components/sections/showcase/artworks";
+import GalleryPicker from "./GalleryPicker";
 
 const initialState: ProjectFormState = {};
 
@@ -14,6 +16,40 @@ export default function ProjectForm({
   action: (state: ProjectFormState, formData: FormData) => Promise<ProjectFormState>;
 }) {
   const [state, formAction, pending] = useActionState(action, initialState);
+
+  // Live preview of the cover image exactly as the site renders it (uncropped,
+  // over a soft blurred fill), so admins can see the card result before saving.
+  const [coverPreview, setCoverPreview] = useState<string | null>(
+    project?.imageUrl ?? null
+  );
+  const [coverRemoved, setCoverRemoved] = useState(false);
+  const objectUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    // Revoke any object URL we created when the component unmounts.
+    return () => {
+      if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+    };
+  }, []);
+
+  function onCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
+    }
+    if (file) {
+      const url = URL.createObjectURL(file);
+      objectUrlRef.current = url;
+      setCoverPreview(url);
+      setCoverRemoved(false);
+    } else {
+      setCoverPreview(project?.imageUrl ?? null);
+    }
+  }
+
+  const previewUrl = coverRemoved ? null : coverPreview;
+  const previewName = project?.name || "Project";
 
   return (
     <form action={formAction} className="mt-8 max-w-2xl space-y-5">
@@ -98,28 +134,108 @@ export default function ProjectForm({
       </label>
 
       <label className="block text-sm">
-        <span className="text-xs uppercase tracking-[0.15em] text-faint">Image</span>
-        {project?.imageUrl && (
-          <div className="mt-2 flex items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={project.imageUrl}
-              alt=""
-              className="h-16 w-16 rounded-lg border hairline object-cover"
-            />
-            <label className="flex items-center gap-2 text-xs text-mist">
-              <input type="checkbox" name="removeImage" className="accent-copper" />
-              Remove current image
-            </label>
-          </div>
-        )}
+        <span className="text-xs uppercase tracking-[0.15em] text-faint">
+          Tech stack (one per line, shown on the project page)
+        </span>
+        <textarea
+          name="techStack"
+          rows={4}
+          placeholder={"Next.js\nPostgreSQL\nAWS"}
+          defaultValue={project?.techStack.join("\n")}
+          className="field mt-1.5 resize-y"
+        />
+      </label>
+
+      <div className="block text-sm">
+        <span className="text-xs uppercase tracking-[0.15em] text-faint">Cover image</span>
+
         <input
           name="image"
           type="file"
           accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+          onChange={onCoverChange}
           className="field mt-1.5"
         />
-      </label>
+
+        {project?.imageUrl && (
+          <label className="mt-2 flex items-center gap-2 text-xs text-mist">
+            <input
+              type="checkbox"
+              name="removeImage"
+              className="accent-copper"
+              onChange={(e) => setCoverRemoved(e.target.checked)}
+            />
+            Remove current image
+          </label>
+        )}
+
+        {/* Recommended size + live preview of how it lands on the site */}
+        <div className="mt-3 rounded-xl border hairline bg-ink-3/40 p-4">
+          <p className="text-xs uppercase tracking-[0.15em] text-faint">
+            Preview on site
+          </p>
+          <p className="mt-1.5 text-xs leading-relaxed text-mist">
+            Recommended: a <strong className="text-paper">landscape image,
+            1600 × 1200&nbsp;px (4:3)</strong>, under 8&nbsp;MB. The image is never
+            cropped — it’s centered and any gaps are filled with a soft blur — so
+            a 4:3 shot fills the venture-card frame most cleanly.
+          </p>
+
+          <div className="mt-4 grid grid-cols-2 gap-4">
+            <div>
+              <p className="mb-1.5 text-[11px] uppercase tracking-[0.15em] text-faint">
+                Desktop card
+              </p>
+              <div className="relative aspect-5/4 w-full overflow-hidden rounded-2xl border hairline bg-ink-3">
+                <ImageArt imageUrl={previewUrl} name={previewName} />
+              </div>
+            </div>
+            <div>
+              <p className="mb-1.5 text-[11px] uppercase tracking-[0.15em] text-faint">
+                Mobile card
+              </p>
+              <div className="relative aspect-video w-full overflow-hidden rounded-2xl border hairline bg-ink-3">
+                <ImageArt imageUrl={previewUrl} name={previewName} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="block text-sm">
+        <span className="text-xs uppercase tracking-[0.15em] text-faint">
+          Gallery images (shown on the project page)
+        </span>
+        {project && project.gallery.length > 0 && (
+          <ul className="mt-2 flex flex-wrap gap-3">
+            {project.gallery.map((url) => (
+              <li key={url} className="flex flex-col items-center gap-1.5">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={url}
+                  alt=""
+                  className="h-16 w-16 rounded-lg border hairline object-cover"
+                />
+                <label className="flex items-center gap-1.5 text-[11px] text-mist">
+                  <input
+                    type="checkbox"
+                    name="removeGalleryImage"
+                    value={url}
+                    className="accent-copper"
+                  />
+                  Remove
+                </label>
+              </li>
+            ))}
+          </ul>
+        )}
+        <GalleryPicker />
+        <p className="mt-2 text-xs text-faint">
+          Click “Add images” as many times as you like to build up the gallery —
+          new picks are added, not replaced. Tick “Remove” above to drop an
+          existing image.
+        </p>
+      </div>
 
       {state.error && (
         <p role="alert" className="text-sm leading-relaxed text-red-400">

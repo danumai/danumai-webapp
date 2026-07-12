@@ -11,6 +11,7 @@ import {
 } from "framer-motion";
 import { useRef, type CSSProperties, type ComponentType } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Reveal from "@/components/ui/Reveal";
 import WordReveal from "@/components/ui/WordReveal";
 import { CareArt, ImageArt, ReelsArt, StudiosArt } from "./showcase/artworks";
@@ -19,6 +20,8 @@ import { DEFAULT_CONTENT, type VenturesHeaderContent } from "@/lib/content";
 
 type Venture = {
   index: string;
+  /** Set for admin-managed projects — links the card to /projects/[slug]. */
+  slug?: string;
   name: string;
   tagline: string;
   description: string;
@@ -75,15 +78,19 @@ const defaultVentures: Venture[] = [
 function toVentures(projects: Project[]): Venture[] {
   return projects.map((p, i) => ({
     index: String(i + 1).padStart(2, "0"),
+    slug: p.slug,
     name: p.name,
     tagline: p.tagline,
     description: p.description,
     status: p.status,
     features: p.features,
     accent: p.accent,
-    Art:
-      HAND_BUILT_ART[p.slug] ??
-      (() => <ImageArt imageUrl={p.imageUrl} name={p.name} />),
+    // An uploaded image always wins; the bespoke art is only a fallback for
+    // the three original ventures when no image has been uploaded for them.
+    Art: p.imageUrl
+      ? () => <ImageArt imageUrl={p.imageUrl} name={p.name} />
+      : HAND_BUILT_ART[p.slug] ??
+        (() => <ImageArt imageUrl={p.imageUrl} name={p.name} />),
   }));
 }
 
@@ -167,9 +174,9 @@ export default function VentureShowcase({
         className="relative"
       >
         <div className="isolate sticky top-0 flex h-svh flex-col justify-center gap-8 overflow-hidden py-16 md:gap-16 md:py-32">
-          <div className="mx-auto w-full max-w-6xl px-6 md:px-10">{headerEl}</div>
-          <div className="mx-auto w-full max-w-6xl px-6 md:px-10">
-            <div className="relative h-108 sm:h-120 md:h-[min(30rem,72svh)]">
+          <div className="mx-auto w-full max-w-5xl px-6 md:px-10">{headerEl}</div>
+          <div className="mx-auto w-full max-w-5xl px-6 md:px-10">
+            <div className="relative h-116 sm:h-124 md:h-[min(28rem,68svh)]">
               {ventures.map((v, i) => (
                 <DeckCard
                   key={v.name}
@@ -309,6 +316,8 @@ function DeckDot({
 /* ---------- the venture card itself ---------- */
 function VentureCard({ v }: { v: Venture }) {
   const accent = v.accent;
+  const router = useRouter();
+  const href = v.slug ? `/projects/${v.slug}` : null;
   const cardBg = `radial-gradient(120% 90% at 100% 0%, ${accent}70, transparent 68%), linear-gradient(158deg, ${accent}48, ${accent}24 55%, transparent 88%), linear-gradient(0deg, ${accent}16, ${accent}16), var(--color-surface)`;
   const cardBorder = `${accent}70`;
   const cardRing = `${accent}45`;
@@ -356,6 +365,9 @@ function VentureCard({ v }: { v: Venture }) {
     >
     <div
       ref={ref}
+      // Whole card navigates to the project page; inner links stop
+      // propagation so "Discuss this venture" still goes to contact.
+      onClick={href ? () => router.push(href) : undefined}
       style={{
         borderColor: cardBorder,
         background: cardBg,
@@ -366,7 +378,9 @@ function VentureCard({ v }: { v: Venture }) {
         "--beam-color-2": `${accent}00`,
         "--beam-width": "1.5px",
       } as CSSProperties}
-      className="beam group relative grid h-full grid-cols-1 gap-4 overflow-hidden rounded-3xl border p-4 sm:gap-6 sm:p-5 md:grid-cols-2 md:gap-8 md:p-6"
+      className={`beam group relative grid h-full grid-cols-1 gap-4 overflow-hidden rounded-3xl border p-4 sm:gap-6 sm:p-5 md:grid-cols-2 md:gap-8 md:p-6 ${
+        href ? "cursor-pointer" : ""
+      }`}
     >
       {/* accent spotlight that trails the cursor */}
       <span
@@ -387,7 +401,7 @@ function VentureCard({ v }: { v: Venture }) {
       />
 
       {/* Art */}
-      <div className="relative z-10 h-32 overflow-hidden rounded-2xl border hairline bg-ink-3 sm:h-44 md:h-full md:max-h-80">
+      <div className="relative z-10 h-40 overflow-hidden rounded-2xl border hairline bg-ink-3 sm:h-56 md:h-full">
         <v.Art />
       </div>
 
@@ -414,7 +428,7 @@ function VentureCard({ v }: { v: Venture }) {
         <p className="mt-1 text-xs sm:text-sm" style={{ color: `${accent}cc` }}>
           {v.tagline}
         </p>
-        <p className="mt-2.5 max-w-md text-sm leading-relaxed text-mist line-clamp-3 md:mt-3 md:line-clamp-none">
+        <p className="mt-2.5 max-w-md text-sm leading-relaxed text-mist line-clamp-2 md:mt-3 md:line-clamp-3">
           {v.description}
         </p>
         <ul className="mt-4 flex flex-wrap gap-1.5 sm:gap-2 md:mt-5">
@@ -428,19 +442,68 @@ function VentureCard({ v }: { v: Venture }) {
             </li>
           ))}
         </ul>
-        <Link
-          href={`/contact?topic=${encodeURIComponent(v.name)}`}
-          className="group mt-4 inline-flex w-fit items-center gap-2 text-sm transition-colors md:mt-6"
-          style={{ color: accent }}
-        >
-          Discuss this venture
-          <span
-            aria-hidden
-            className="inline-block transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1"
+        <div className="mt-4 flex items-center gap-2.5 md:mt-6">
+          {href && (
+            <Link
+              href={href}
+              onClick={(e) => e.stopPropagation()}
+              aria-label={`Explore ${v.name}`}
+              title="Explore project"
+              className="group/icon inline-flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-300 hover:scale-110"
+              style={{
+                borderColor: `${accent}45`,
+                color: accent,
+                background: `${accent}12`,
+              }}
+            >
+              <svg
+                aria-hidden
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4.5 w-4.5 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/icon:translate-x-0.5 group-hover/icon:-translate-y-0.5"
+              >
+                {/* arrow-up-right: opens the project page */}
+                <path d="M7 17 17 7" />
+                <path d="M8 7h9v9" />
+              </svg>
+            </Link>
+          )}
+          <Link
+            href={`/contact?topic=${encodeURIComponent(v.name)}`}
+            onClick={(e) => e.stopPropagation()}
+            aria-label={`Discuss ${v.name} with us`}
+            title="Discuss this venture"
+            className={`group/icon inline-flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-300 hover:scale-110 ${
+              href ? "hairline" : ""
+            }`}
+            style={
+              href
+                ? undefined
+                : { borderColor: `${accent}45`, color: accent, background: `${accent}12` }
+            }
           >
-            →
-          </span>
-        </Link>
+            <svg
+              aria-hidden
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={`h-4.5 w-4.5 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/icon:translate-x-0.5 group-hover/icon:-translate-y-0.5 ${
+                href ? "text-mist group-hover/icon:text-paper" : ""
+              }`}
+            >
+              {/* paper plane: send us a message to discuss this venture */}
+              <path d="M21.5 3.5 2.8 10.4a.6.6 0 0 0 .05 1.13l7.02 2.16 2.16 7.02a.6.6 0 0 0 1.13.05L21.5 3.5Z" />
+              <path d="M21.5 3.5 9.87 13.69" />
+            </svg>
+          </Link>
+        </div>
       </div>
     </div>
     </motion.div>

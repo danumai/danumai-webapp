@@ -6,6 +6,7 @@ import {
   createProject,
   updateProject,
   deleteProject,
+  getProject,
   setProjectPublished,
   quickUpdateProject,
   moveProject,
@@ -27,7 +28,12 @@ function parseFeatures(raw: string): string[] {
     .slice(0, 12);
 }
 
-async function readInput(formData: FormData, existingImageUrl: string | null): Promise<ProjectInput> {
+export type ExistingImages = {
+  imageUrl: string | null;
+  gallery: string[];
+};
+
+async function readInput(formData: FormData, existing: ExistingImages): Promise<ProjectInput> {
   const name = String(formData.get("name") ?? "").trim();
   const slugRaw = String(formData.get("slug") ?? "").trim();
   const tagline = String(formData.get("tagline") ?? "").trim();
@@ -37,17 +43,35 @@ async function readInput(formData: FormData, existingImageUrl: string | null): P
   const sortOrder = Number(formData.get("sortOrder") ?? 0) || 0;
   const published = formData.get("published") === "on";
   const features = parseFeatures(String(formData.get("features") ?? ""));
+  const techStack = parseFeatures(String(formData.get("techStack") ?? ""));
 
   if (!name) throw new Error("Name is required.");
 
-  let imageUrl = existingImageUrl;
+  let imageUrl = existing.imageUrl;
   const file = formData.get("image");
   if (file instanceof File && file.size > 0) {
     imageUrl = await uploadImage(file, "projects");
-    if (existingImageUrl) await deleteImage(existingImageUrl);
-  } else if (formData.get("removeImage") === "on" && existingImageUrl) {
-    await deleteImage(existingImageUrl);
+    if (existing.imageUrl) await deleteImage(existing.imageUrl);
+  } else if (formData.get("removeImage") === "on" && existing.imageUrl) {
+    await deleteImage(existing.imageUrl);
     imageUrl = null;
+  }
+
+  // Gallery: keep existing images unless individually marked for removal,
+  // then append any newly uploaded files.
+  const removeSet = new Set(
+    formData.getAll("removeGalleryImage").map((v) => String(v))
+  );
+  const kept = existing.gallery.filter((url) => !removeSet.has(url));
+  for (const url of existing.gallery) {
+    if (removeSet.has(url)) await deleteImage(url);
+  }
+  const galleryFiles = formData
+    .getAll("galleryImages")
+    .filter((f): f is File => f instanceof File && f.size > 0);
+  const uploaded: string[] = [];
+  for (const gf of galleryFiles) {
+    uploaded.push(await uploadImage(gf, "projects/gallery"));
   }
 
   return {
@@ -58,7 +82,9 @@ async function readInput(formData: FormData, existingImageUrl: string | null): P
     status,
     features,
     accent,
+    techStack,
     imageUrl,
+    gallery: [...kept, ...uploaded],
     published,
     sortOrder,
   };
@@ -70,7 +96,7 @@ export async function createProjectAction(
 ): Promise<ProjectFormState> {
   await requireAdmin();
   try {
-    const input = await readInput(formData, null);
+    const input = await readInput(formData, { imageUrl: null, gallery: [] });
     await createProject(input);
   } catch (err) {
     console.error("createProjectAction failed", err);
@@ -83,13 +109,13 @@ export async function createProjectAction(
 
 export async function updateProjectAction(
   id: string,
-  existingImageUrl: string | null,
+  existing: ExistingImages,
   _prevState: ProjectFormState,
   formData: FormData
 ): Promise<ProjectFormState> {
   await requireAdmin();
   try {
-    const input = await readInput(formData, existingImageUrl);
+    const input = await readInput(formData, existing);
     await updateProject(id, input);
   } catch (err) {
     console.error("updateProjectAction failed", err);
@@ -102,8 +128,12 @@ export async function updateProjectAction(
 
 export async function deleteProjectAction(id: string, imageUrl: string | null) {
   await requireAdmin();
+  const project = await getProject(id);
   await deleteProject(id);
   if (imageUrl) await deleteImage(imageUrl);
+  for (const url of project?.gallery ?? []) {
+    await deleteImage(url);
+  }
   revalidatePath("/admin/projects");
   revalidatePath("/");
 }
