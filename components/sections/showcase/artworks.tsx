@@ -200,22 +200,16 @@ export function ImageArt({ imageUrl, name }: { imageUrl: string | null; name: st
     );
   }
   return (
-    <div className="relative h-full w-full overflow-hidden">
-      {/* soft blurred fill of the same image, so the whole shot can sit
-          uncropped in front without leaving empty bars around it */}
+    <div className="relative h-full w-full overflow-hidden bg-ink-3">
+      {/* The card frame is 4:3 and covers are cropped to 4:3 on upload, so a
+          recommended-size cover fills this frame exactly — no crop, no empty
+          bands. object-cover also keeps any off-ratio upload (e.g. an SVG)
+          filling the frame edge-to-edge rather than letterboxing. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={imageUrl}
         alt=""
-        aria-hidden
-        className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl"
-      />
-      {/* the full image, never zoomed or cropped */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={imageUrl}
-        alt=""
-        className="relative h-full w-full object-contain"
+        className="absolute inset-0 h-full w-full object-cover"
       />
     </div>
   );

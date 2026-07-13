@@ -18,12 +18,12 @@ export type JobFormState = {
   error?: string;
 };
 
-function parsePoints(raw: string): string[] {
+function parseLines(raw: string, max: number): string[] {
   return raw
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean)
-    .slice(0, 12);
+    .slice(0, max);
 }
 
 function readInput(formData: FormData): JobInput {
@@ -32,8 +32,10 @@ function readInput(formData: FormData): JobInput {
   const team = String(formData.get("team") ?? "").trim();
   const location = String(formData.get("location") ?? "").trim();
   const type = String(formData.get("type") ?? "").trim();
+  const salary = String(formData.get("salary") ?? "").trim();
   const summary = String(formData.get("summary") ?? "").trim();
-  const points = parsePoints(String(formData.get("points") ?? ""));
+  const points = parseLines(String(formData.get("points") ?? ""), 12);
+  const perks = parseLines(String(formData.get("perks") ?? ""), 12);
   const published = formData.get("published") === "on";
   const sortOrder = Number(formData.get("sortOrder") ?? 0) || 0;
 
@@ -45,8 +47,10 @@ function readInput(formData: FormData): JobInput {
     team,
     location,
     type,
+    salary,
     summary,
     points,
+    perks,
     published,
     sortOrder,
   };

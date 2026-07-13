@@ -9,8 +9,10 @@ export type Job = {
   team: string;
   location: string;
   type: string;
+  salary: string;
   summary: string;
   points: string[];
+  perks: string[];
   published: boolean;
   sortOrder: number;
 };
@@ -23,8 +25,10 @@ function mapRow(row: JobModel): Job {
     team: row.team,
     location: row.location,
     type: row.type,
+    salary: row.salary,
     summary: row.summary,
     points: (row.points as string[]) ?? [],
+    perks: (row.perks as string[]) ?? [],
     published: row.published,
     sortOrder: row.sortOrder,
   };
@@ -49,8 +53,10 @@ export type JobInput = {
   team: string;
   location: string;
   type: string;
+  salary: string;
   summary: string;
   points: string[];
+  perks: string[];
   published: boolean;
   sortOrder: number;
 };

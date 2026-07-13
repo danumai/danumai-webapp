@@ -11,6 +11,7 @@ import {
   quickUpdateProject,
   moveProject,
   type ProjectInput,
+  type CoverCrop,
 } from "@/lib/data/projects";
 import { uploadImage, deleteImage } from "@/lib/storage";
 import { slugify } from "@/lib/slugify";
@@ -30,8 +31,28 @@ function parseFeatures(raw: string): string[] {
 
 export type ExistingImages = {
   imageUrl: string | null;
+  imageOriginalUrl: string | null;
+  imageCrop: CoverCrop | null;
   gallery: string[];
 };
+
+/** Parse and sanity-check the crop JSON the form posts (normalized 0..1). */
+function parseCrop(raw: string): CoverCrop | null {
+  if (!raw) return null;
+  try {
+    const c = JSON.parse(raw) as Record<string, unknown>;
+    const nums = [c.x, c.y, c.w, c.h];
+    if (!nums.every((n) => typeof n === "number" && Number.isFinite(n))) return null;
+    const { x, y, w, h } = c as unknown as CoverCrop;
+    // A zoomed-out framing extends past the image (x/y negative, w/h > 1),
+    // so only reject degenerate or absurd rects, not out-of-bounds ones.
+    if (w <= 0 || h <= 0 || w > 8 || h > 8 || Math.abs(x) > 4 || Math.abs(y) > 4)
+      return null;
+    return { x, y, w, h };
+  } catch {
+    return null;
+  }
+}
 
 async function readInput(formData: FormData, existing: ExistingImages): Promise<ProjectInput> {
   const name = String(formData.get("name") ?? "").trim();
@@ -47,14 +68,45 @@ async function readInput(formData: FormData, existing: ExistingImages): Promise<
 
   if (!name) throw new Error("Name is required.");
 
+  // Cover pipeline: `image` is the 4:3 crop the site displays; `imageOriginal`
+  // is the pristine upload it was framed from; `imageCrop` records where. The
+  // original + crop are kept so the framing stays re-editable without loss.
   let imageUrl = existing.imageUrl;
+  let imageOriginalUrl = existing.imageOriginalUrl;
+  let imageCrop = existing.imageCrop;
   const file = formData.get("image");
+  const originalFile = formData.get("imageOriginal");
+  const crop = parseCrop(String(formData.get("imageCrop") ?? ""));
+
   if (file instanceof File && file.size > 0) {
     imageUrl = await uploadImage(file, "projects");
-    if (existing.imageUrl) await deleteImage(existing.imageUrl);
+    if (originalFile instanceof File && originalFile.size > 0) {
+      // Fresh framed upload: the new original replaces both old files.
+      imageOriginalUrl = await uploadImage(originalFile, "projects/originals");
+      imageCrop = crop;
+      if (existing.imageOriginalUrl) await deleteImage(existing.imageOriginalUrl);
+      if (existing.imageUrl) await deleteImage(existing.imageUrl);
+    } else if (crop && existing.imageOriginalUrl) {
+      // Re-framed from the saved original: keep it, swap the displayed crop.
+      imageCrop = crop;
+      if (existing.imageUrl) await deleteImage(existing.imageUrl);
+    } else if (crop && existing.imageUrl) {
+      // Cover saved before originals were kept, now re-framed: the old cover
+      // is the source the admin framed, so promote it to the original.
+      imageOriginalUrl = existing.imageUrl;
+      imageCrop = crop;
+    } else {
+      // Plain unframed replacement (SVG/GIF): no original, no crop.
+      imageOriginalUrl = null;
+      if (existing.imageOriginalUrl) await deleteImage(existing.imageOriginalUrl);
+      if (existing.imageUrl) await deleteImage(existing.imageUrl);
+    }
   } else if (formData.get("removeImage") === "on" && existing.imageUrl) {
     await deleteImage(existing.imageUrl);
+    if (existing.imageOriginalUrl) await deleteImage(existing.imageOriginalUrl);
     imageUrl = null;
+    imageOriginalUrl = null;
+    imageCrop = null;
   }
 
   // Gallery: keep existing images unless individually marked for removal,
@@ -84,6 +136,8 @@ async function readInput(formData: FormData, existing: ExistingImages): Promise<
     accent,
     techStack,
     imageUrl,
+    imageOriginalUrl,
+    imageCrop,
     gallery: [...kept, ...uploaded],
     published,
     sortOrder,
@@ -96,7 +150,12 @@ export async function createProjectAction(
 ): Promise<ProjectFormState> {
   await requireAdmin();
   try {
-    const input = await readInput(formData, { imageUrl: null, gallery: [] });
+    const input = await readInput(formData, {
+      imageUrl: null,
+      imageOriginalUrl: null,
+      imageCrop: null,
+      gallery: [],
+    });
     await createProject(input);
   } catch (err) {
     console.error("createProjectAction failed", err);
@@ -131,6 +190,9 @@ export async function deleteProjectAction(id: string, imageUrl: string | null) {
   const project = await getProject(id);
   await deleteProject(id);
   if (imageUrl) await deleteImage(imageUrl);
+  if (project?.imageOriginalUrl && project.imageOriginalUrl !== imageUrl) {
+    await deleteImage(project.imageOriginalUrl);
+  }
   for (const url of project?.gallery ?? []) {
     await deleteImage(url);
   }

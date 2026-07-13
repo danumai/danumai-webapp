@@ -30,14 +30,19 @@ export default function JobForm({
         </label>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-3">
+      <div className="grid gap-5 sm:grid-cols-2">
         <label className="block text-sm">
           <span className="text-xs uppercase tracking-[0.15em] text-faint">Team</span>
           <input name="team" defaultValue={job?.team} className="field mt-1.5" />
         </label>
         <label className="block text-sm">
           <span className="text-xs uppercase tracking-[0.15em] text-faint">Location</span>
-          <input name="location" defaultValue={job?.location} className="field mt-1.5" />
+          <input
+            name="location"
+            placeholder="e.g. Niketon, Dhaka · Onsite"
+            defaultValue={job?.location}
+            className="field mt-1.5"
+          />
         </label>
         <label className="block text-sm">
           <span className="text-xs uppercase tracking-[0.15em] text-faint">Type</span>
@@ -45,6 +50,15 @@ export default function JobForm({
             name="type"
             placeholder="e.g. Full-time"
             defaultValue={job?.type}
+            className="field mt-1.5"
+          />
+        </label>
+        <label className="block text-sm">
+          <span className="text-xs uppercase tracking-[0.15em] text-faint">Salary</span>
+          <input
+            name="salary"
+            placeholder="e.g. BDT 35,000–40,000/mo"
+            defaultValue={job?.salary}
             className="field mt-1.5"
           />
         </label>
@@ -68,6 +82,19 @@ export default function JobForm({
           name="points"
           rows={4}
           defaultValue={job?.points.join("\n")}
+          className="field mt-1.5 resize-y"
+        />
+      </label>
+
+      <label className="block text-sm">
+        <span className="text-xs uppercase tracking-[0.15em] text-faint">
+          Benefits &amp; perks (one per line)
+        </span>
+        <textarea
+          name="perks"
+          rows={3}
+          placeholder={"e.g.\n2× festival bonus\nLunch provided\nDevice provided"}
+          defaultValue={job?.perks.join("\n")}
           className="field mt-1.5 resize-y"
         />
       </label>

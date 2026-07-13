@@ -400,8 +400,13 @@ function VentureCard({ v }: { v: Venture }) {
         }}
       />
 
-      {/* Art */}
-      <div className="relative z-10 h-40 overflow-hidden rounded-2xl border hairline bg-ink-3 sm:h-56 md:h-full">
+      {/* Art — a 4:3 media panel at every breakpoint so a 4:3 cover (the
+          recommended 1600×1200) fills it edge-to-edge with no crop and no empty
+          bands. Height-driven and centered on mobile (a tidy framed thumbnail);
+          width-driven and vertically centered inside the taller card cell on
+          desktop, where any leftover space is the card's own accent surface,
+          not dead white. */}
+      <div className="relative z-10 mx-auto aspect-4/3 h-40 w-auto self-center overflow-hidden rounded-2xl border hairline bg-ink-3 sm:h-52 md:mx-0 md:h-auto md:w-full">
         <v.Art />
       </div>
 

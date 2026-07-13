@@ -2,6 +2,7 @@
 
 import { createApplication } from "@/lib/data/submissions";
 import { sendMail } from "@/lib/mailer";
+import { normalizeApplicationLinks, linkLabel } from "@/lib/applicationLinks";
 
 export type ApplyState = {
   status: "success" | "error";
@@ -14,8 +15,16 @@ export async function sendApplication(
 ): Promise<ApplyState> {
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
-  const portfolio = String(formData.get("portfolio") ?? "").trim();
   const note = String(formData.get("note") ?? "").trim();
+
+  // Optional links (GitHub, LinkedIn, resume, …) arrive as a JSON blob that the
+  // form assembled from whatever fields the applicant chose to add.
+  let links: ReturnType<typeof normalizeApplicationLinks> = [];
+  try {
+    links = normalizeApplicationLinks(JSON.parse(String(formData.get("links") ?? "[]")));
+  } catch {
+    links = [];
+  }
 
   if (!name || !email || !note) {
     return { status: "error", message: "Please fill in every field." };
@@ -24,17 +33,20 @@ export async function sendApplication(
   // Persist first so the application is recorded in the admin panel even if the
   // notification email later fails to send.
   try {
-    await createApplication({ jobTitle, name, email, portfolio, note });
+    await createApplication({ jobTitle, name, email, portfolio: "", links, note });
   } catch (err) {
     console.error("createApplication failed", err);
   }
 
   try {
+    const linkLines = links.length
+      ? links.map((l) => `${linkLabel(l.type)}: ${l.value}`).join("\n")
+      : "—";
     await sendMail({
       to: process.env.NOTIFY_EMAIL ?? process.env.GMAIL_USER!,
       replyTo: email,
       subject: `Application — ${jobTitle} — ${name}`,
-      text: `${note}\n\nPortfolio / work: ${portfolio || "—"}\n\n—\n${name}\n${email}`,
+      text: `${note}\n\nLinks:\n${linkLines}\n\n—\n${name}\n${email}`,
     });
     return { status: "success" };
   } catch (err) {

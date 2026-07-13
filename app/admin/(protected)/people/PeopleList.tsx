@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import type { Application, ContactMessage } from "@/lib/data/submissions";
+import { linkLabel } from "@/lib/applicationLinks";
 import {
   toggleApplicationReadAction,
   deleteApplicationAction,
@@ -83,6 +86,8 @@ export default function PeopleList({
 
 function ApplicationsList({ applications }: { applications: Application[] }) {
   const [pending, startTransition] = useTransition();
+  const toast = useToast();
+  const confirm = useConfirm();
 
   if (applications.length === 0) {
     return <p className="text-sm text-mist">No applications yet.</p>;
@@ -127,10 +132,22 @@ function ApplicationsList({ applications }: { applications: Application[] }) {
                   toggleApplicationReadAction(a.id, !a.read)
                 )
               }
-              onDelete={() => {
-                if (confirm(`Delete application from ${a.name}?`)) {
-                  startTransition(() => deleteApplicationAction(a.id));
-                }
+              onDelete={async () => {
+                const ok = await confirm({
+                  title: "Delete application",
+                  message: `Delete application from ${a.name}?`,
+                  confirmLabel: "Delete",
+                  destructive: true,
+                });
+                if (!ok) return;
+                startTransition(async () => {
+                  try {
+                    await deleteApplicationAction(a.id);
+                    toast(`Deleted application from ${a.name}`, "success");
+                  } catch {
+                    toast("Couldn't delete application. Try again.", "error");
+                  }
+                });
               }}
             />
           </div>
@@ -147,6 +164,23 @@ function ApplicationsList({ applications }: { applications: Application[] }) {
               </a>
             </p>
           )}
+          {a.links.length > 0 && (
+            <ul className="mt-3 space-y-1">
+              {a.links.map((link, i) => (
+                <li key={`${link.type}-${i}`} className="break-words text-sm text-mist">
+                  <span className="text-faint">{linkLabel(link.type)}: </span>
+                  <a
+                    href={link.value}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-copper hover:text-copper-soft"
+                  >
+                    {link.value}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
           {a.note && (
             <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-mist">
               {a.note}
@@ -160,6 +194,8 @@ function ApplicationsList({ applications }: { applications: Application[] }) {
 
 function MessagesList({ messages }: { messages: ContactMessage[] }) {
   const [pending, startTransition] = useTransition();
+  const toast = useToast();
+  const confirm = useConfirm();
 
   if (messages.length === 0) {
     return <p className="text-sm text-mist">No messages yet.</p>;
@@ -199,10 +235,22 @@ function MessagesList({ messages }: { messages: ContactMessage[] }) {
                   toggleContactMessageReadAction(m.id, !m.read)
                 )
               }
-              onDelete={() => {
-                if (confirm(`Delete message from ${m.name}?`)) {
-                  startTransition(() => deleteContactMessageAction(m.id));
-                }
+              onDelete={async () => {
+                const ok = await confirm({
+                  title: "Delete message",
+                  message: `Delete message from ${m.name}?`,
+                  confirmLabel: "Delete",
+                  destructive: true,
+                });
+                if (!ok) return;
+                startTransition(async () => {
+                  try {
+                    await deleteContactMessageAction(m.id);
+                    toast(`Deleted message from ${m.name}`, "success");
+                  } catch {
+                    toast("Couldn't delete message. Try again.", "error");
+                  }
+                });
               }}
             />
           </div>

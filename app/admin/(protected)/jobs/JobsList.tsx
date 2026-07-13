@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import type { Job } from "@/lib/data/jobs";
 import {
   deleteJobAction,
@@ -13,6 +15,8 @@ import {
 export default function JobsList({ jobs }: { jobs: Job[] }) {
   const [editing, setEditing] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const toast = useToast();
+  const confirm = useConfirm();
 
   if (jobs.length === 0) {
     return <p className="text-sm text-mist">No jobs yet.</p>;
@@ -78,10 +82,22 @@ export default function JobsList({ jobs }: { jobs: Job[] }) {
               Edit
             </Link>
             <button
-              onClick={() => {
-                if (confirm(`Delete “${j.title}”? This can't be undone.`)) {
-                  startTransition(() => deleteJobAction(j.id));
-                }
+              onClick={async () => {
+                const ok = await confirm({
+                  title: "Delete job",
+                  message: `Delete “${j.title}”? This can't be undone.`,
+                  confirmLabel: "Delete",
+                  destructive: true,
+                });
+                if (!ok) return;
+                startTransition(async () => {
+                  try {
+                    await deleteJobAction(j.id);
+                    toast(`Deleted “${j.title}”`, "success");
+                  } catch {
+                    toast("Couldn't delete job. Try again.", "error");
+                  }
+                });
               }}
               disabled={pending}
               className="text-sm text-red-400 hover:text-red-300 disabled:opacity-50"

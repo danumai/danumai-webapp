@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import type { Project } from "@/lib/data/projects";
 import {
   deleteProjectAction,
@@ -13,6 +15,8 @@ import {
 export default function ProjectsList({ projects }: { projects: Project[] }) {
   const [editing, setEditing] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const toast = useToast();
+  const confirm = useConfirm();
 
   if (projects.length === 0) {
     return <p className="text-sm text-mist">No projects yet.</p>;
@@ -85,10 +89,22 @@ export default function ProjectsList({ projects }: { projects: Project[] }) {
               Edit
             </Link>
             <button
-              onClick={() => {
-                if (confirm(`Delete “${p.name}”? This can't be undone.`)) {
-                  startTransition(() => deleteProjectAction(p.id, p.imageUrl));
-                }
+              onClick={async () => {
+                const ok = await confirm({
+                  title: "Delete project",
+                  message: `Delete “${p.name}”? This can't be undone.`,
+                  confirmLabel: "Delete",
+                  destructive: true,
+                });
+                if (!ok) return;
+                startTransition(async () => {
+                  try {
+                    await deleteProjectAction(p.id, p.imageUrl);
+                    toast(`Deleted “${p.name}”`, "success");
+                  } catch {
+                    toast("Couldn't delete project. Try again.", "error");
+                  }
+                });
               }}
               disabled={pending}
               className="text-sm text-red-400 hover:text-red-300 disabled:opacity-50"

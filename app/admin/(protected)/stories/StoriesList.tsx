@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import type { Story } from "@/lib/data/stories";
 import {
   deleteStoryAction,
@@ -20,6 +22,8 @@ function formatDate(iso: string): string {
 export default function StoriesList({ stories }: { stories: Story[] }) {
   const [editing, setEditing] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const toast = useToast();
+  const confirm = useConfirm();
 
   if (stories.length === 0) {
     return <p className="text-sm text-mist">No stories yet.</p>;
@@ -86,10 +90,22 @@ export default function StoriesList({ stories }: { stories: Story[] }) {
               Edit
             </Link>
             <button
-              onClick={() => {
-                if (confirm(`Delete “${s.title}”? This can't be undone.`)) {
-                  startTransition(() => deleteStoryAction(s.id, s.coverUrl));
-                }
+              onClick={async () => {
+                const ok = await confirm({
+                  title: "Delete story",
+                  message: `Delete “${s.title}”? This can't be undone.`,
+                  confirmLabel: "Delete",
+                  destructive: true,
+                });
+                if (!ok) return;
+                startTransition(async () => {
+                  try {
+                    await deleteStoryAction(s.id, s.coverUrl);
+                    toast(`Deleted “${s.title}”`, "success");
+                  } catch {
+                    toast("Couldn't delete story. Try again.", "error");
+                  }
+                });
               }}
               disabled={pending}
               className="text-sm text-red-400 hover:text-red-300 disabled:opacity-50"

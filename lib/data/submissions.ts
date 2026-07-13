@@ -3,6 +3,10 @@ import type {
   Application as ApplicationModel,
   ContactMessage as ContactMessageModel,
 } from "@/generated/prisma/client";
+import {
+  normalizeApplicationLinks,
+  type ApplicationLink,
+} from "@/lib/applicationLinks";
 
 // Submissions are the "people" side of the site: job applications from the
 // careers page and messages from the contact form. They share the same shape
@@ -15,6 +19,7 @@ export type Application = {
   name: string;
   email: string;
   portfolio: string;
+  links: ApplicationLink[];
   note: string;
   read: boolean;
   createdAt: string;
@@ -27,6 +32,7 @@ function mapApplication(row: ApplicationModel): Application {
     name: row.name,
     email: row.email,
     portfolio: row.portfolio,
+    links: normalizeApplicationLinks(row.links),
     note: row.note,
     read: row.read,
     createdAt: row.createdAt.toISOString(),
@@ -62,6 +68,7 @@ export async function createApplication(input: {
   name: string;
   email: string;
   portfolio: string;
+  links: ApplicationLink[];
   note: string;
 }): Promise<void> {
   await prisma.application.create({ data: input });

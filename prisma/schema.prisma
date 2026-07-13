@@ -23,6 +23,10 @@ model Project {
   accent      String   @default("#d99a4e")
   techStack   Json     @default("[]") @map("tech_stack")
   imageUrl    String?  @map("image_url")
+  // The untouched upload behind the 4:3 cover crop, so framing can be
+  // re-edited losslessly, plus the crop rect (normalized 0..1 x/y/w/h).
+  imageOriginalUrl String? @map("image_original_url")
+  imageCrop        Json?   @map("image_crop")
   gallery     Json     @default("[]")
   published   Boolean  @default(true)
   sortOrder   Int      @default(0) @map("sort_order")
@@ -39,8 +43,10 @@ model Job {
   team      String   @default("")
   location  String   @default("")
   type      String   @default("")
+  salary    String   @default("")
   summary   String   @default("")
   points    Json     @default("[]")
+  perks     Json     @default("[]")
   published Boolean  @default(true)
   sortOrder Int      @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -63,6 +69,10 @@ model Application {
   name      String
   email     String
   portfolio String   @default("")
+  // Optional links the applicant chose to add (GitHub, LinkedIn, résumé, …).
+  // Stored as an array of { type, value }; the catalog of types lives in
+  // lib/applicationLinks.ts.
+  links     Json     @default("[]")
   note      String   @default("")
   read      Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)

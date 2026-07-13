@@ -14,6 +14,8 @@ export default async function EditProjectPage({
 
   const boundAction = updateProjectAction.bind(null, project.id, {
     imageUrl: project.imageUrl,
+    imageOriginalUrl: project.imageOriginalUrl,
+    imageCrop: project.imageCrop,
     gallery: project.gallery,
   });
 

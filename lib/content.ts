@@ -383,8 +383,8 @@ export const DEFAULT_CONTENT: SiteContent = {
       { label: "Care Technology", href: "/#ventures" },
       { label: "Danumai Labs", href: "/#labs" },
     ],
-    email: "hello@danumai.com",
-    location: "Dhaka · Remote",
+    email: "danumaiinc@gmail.com",
+    location: "Niketon, Dhaka · Onsite",
     socials: [
       { label: "LinkedIn", href: "https://www.linkedin.com/company/banglareels" },
       { label: "X", href: "https://x.com/danumai" },
