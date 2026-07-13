@@ -50,7 +50,7 @@ const projects = [
     status: "Research",
     features: ["Vertical video ad units", "Regional targeting", "Advertiser dashboard", "Real-time measurement"],
     accent: "#2563eb",
-    imageUrl: "/projects/ad-network-cover.svg",
+    imageUrl: "/projects/ad-network-cover.png",
     sortOrder: 4,
   },
 ];
