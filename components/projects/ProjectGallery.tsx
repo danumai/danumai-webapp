@@ -68,36 +68,36 @@ export default function ProjectGallery({
           role="dialog"
           aria-modal="true"
           aria-label={`${name} gallery`}
-          className="fixed inset-0 z-999 flex flex-col items-center justify-center bg-ink/95 p-4 backdrop-blur-md sm:p-8"
+          className="fixed inset-0 z-999 flex flex-col bg-ink/95 p-3 backdrop-blur-md sm:p-6"
           // The site hides the native pointer for its custom cursor, which the
           // overlay covers — restore a real cursor so the controls are usable.
           style={{ cursor: "zoom-out" }}
           onClick={close}
         >
-          {/* Close — always visible, top-right of the viewport */}
-          <button
-            type="button"
-            onClick={close}
-            aria-label="Close gallery"
-            style={{ cursor: "pointer" }}
-            className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border hairline bg-ink/60 text-mist transition-colors hover:text-paper sm:right-6 sm:top-6"
-          >
-            <svg
-              aria-hidden
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              className="h-5 w-5"
+          {/* Top bar: counter on the left, close on the right — kept above the
+              image so nothing overlaps the picture, on mobile or desktop. */}
+          <div className="flex w-full shrink-0 items-center justify-between gap-3">
+            <span className="text-sm text-mist" style={{ cursor: "auto" }}>
+              {open + 1} / {images.length}
+            </span>
+            <button
+              type="button"
+              onClick={close}
+              aria-label="Close gallery"
+              style={{ cursor: "pointer" }}
+              className="flex h-10 w-10 items-center justify-center rounded-full border hairline bg-ink/60 text-mist transition-colors hover:text-paper sm:h-11 sm:w-11"
             >
-              <path d="M6 6l12 12M18 6L6 18" />
-            </svg>
-          </button>
+              <svg aria-hidden viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" className="h-5 w-5">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+          </div>
 
-          {/* Prev / Next arrows flanking the image */}
-          {images.length > 1 && (
-            <>
+          {/* Image stage: fills the remaining height. The image scales up to
+              fill this box (small images no longer look tiny) while staying
+              clear of the controls. */}
+          <div className="relative flex min-h-0 w-full flex-1 items-center justify-center py-3">
+            {images.length > 1 && (
               <button
                 type="button"
                 onClick={(e) => {
@@ -106,12 +106,29 @@ export default function ProjectGallery({
                 }}
                 aria-label="Previous image"
                 style={{ cursor: "pointer" }}
-                className="absolute left-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border hairline bg-ink/60 text-mist transition-colors hover:text-paper sm:left-6"
+                className="absolute left-0 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border hairline bg-ink/70 text-mist backdrop-blur-sm transition-colors hover:text-paper sm:h-11 sm:w-11"
               >
                 <svg aria-hidden viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
                   <path d="M15 6l-6 6 6 6" />
                 </svg>
               </button>
+            )}
+
+            <motion.img
+              key={open}
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              src={images[open]}
+              alt={`${name} screenshot ${open + 1}`}
+              style={{ cursor: "auto" }}
+              // h-full/w-full + object-contain fills the stage, so small images
+              // scale up to fit while staying inside the controls' bounds.
+              className="h-full w-full object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+
+            {images.length > 1 && (
               <button
                 type="button"
                 onClick={(e) => {
@@ -120,33 +137,14 @@ export default function ProjectGallery({
                 }}
                 aria-label="Next image"
                 style={{ cursor: "pointer" }}
-                className="absolute right-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border hairline bg-ink/60 text-mist transition-colors hover:text-paper sm:right-6"
+                className="absolute right-0 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border hairline bg-ink/70 text-mist backdrop-blur-sm transition-colors hover:text-paper sm:h-11 sm:w-11"
               >
                 <svg aria-hidden viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
                   <path d="M9 6l6 6-6 6" />
                 </svg>
               </button>
-            </>
-          )}
-
-          {/* Fixed-size stage so object-contain scales the image UP to fill it
-              (a low-res image no longer shows as a tiny stamp); the transparent
-              contain area is invisible against the dark backdrop. */}
-          <motion.img
-            key={open}
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            src={images[open]}
-            alt={`${name} screenshot ${open + 1}`}
-            style={{ cursor: "auto" }}
-            className="h-[82svh] w-[min(92vw,1200px)] rounded-2xl border hairline object-contain shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          />
-
-          <p className="mt-4 text-sm text-mist">
-            {open + 1} / {images.length}
-          </p>
+            )}
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
@@ -154,13 +152,17 @@ export default function ProjectGallery({
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
+      {/* Masonry via CSS columns: each screenshot keeps its natural aspect
+          ratio, so portrait app shots and wide dashboards both display at their
+          true proportions — nothing is cropped and nothing is letterboxed. The
+          `break-inside-avoid` keeps a tile from splitting across a column. */}
+      <div className="gap-3 [column-fill:balance] columns-2 sm:gap-4 md:columns-3">
         {images.map((url, i) => (
           <button
             key={url}
             type="button"
             onClick={() => setOpen(i)}
-            className="group relative aspect-4/3 overflow-hidden rounded-2xl border hairline bg-ink-3 focus-visible:outline-2"
+            className="group relative mb-3 block w-full break-inside-avoid overflow-hidden rounded-2xl border hairline bg-ink-3 focus-visible:outline-2 sm:mb-4"
             style={{ outlineColor: accent }}
             aria-label={`View ${name} image ${i + 1} of ${images.length}`}
           >
@@ -169,7 +171,7 @@ export default function ProjectGallery({
               src={url}
               alt={`${name} screenshot ${i + 1}`}
               loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+              className="block h-auto w-full transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
             />
             <span
               aria-hidden

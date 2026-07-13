@@ -5,6 +5,7 @@
 // Usage: npm run seed   (requires DATABASE_URL in the environment or .env)
 import "dotenv/config";
 import { prisma } from "../lib/prisma";
+import { estimateReadMinutes } from "../lib/data/stories";
 
 const projects = [
   {
@@ -39,6 +40,35 @@ const projects = [
     features: ["Shift coordination", "Family updates", "Care logs", "Gentle reminders"],
     accent: "#0d9488",
     sortOrder: 3,
+  },
+  {
+    slug: "ad-network",
+    name: "Ad Network",
+    tagline: "Monetization infrastructure for vertical streaming",
+    description:
+      "The ad layer connecting BanglaReels and our other platforms to advertisers — targeting, delivery, and measurement built for vertical video from the ground up, not repurposed from display.",
+    status: "Research",
+    features: ["Vertical video ad units", "Regional targeting", "Advertiser dashboard", "Real-time measurement"],
+    accent: "#2563eb",
+    imageUrl: "/projects/ad-network-cover.svg",
+    sortOrder: 4,
+  },
+];
+
+const stories = [
+  {
+    slug: "banglareels-launches-july-20",
+    title: "BanglaReels launches July 20",
+    subtitle: "Vertical serials for the Bangla-speaking world, live in two weeks",
+    category: "Launch",
+    excerpt:
+      "BanglaReels opens to viewers on July 20 — the first vertical micro-drama platform built ground-up for how 300 million Bangla speakers actually watch.",
+    body:
+      "BanglaReels launches on July 20, bringing serialized, episode-by-episode vertical drama to the Bangla-speaking world. Built in-house by Danumai Labs, the platform is designed around how people already watch on their phones — short episodes, fast unlocks, and an offline-first experience for patchy connections.\n\nThis is the first release from Danumai Inc.'s house of ventures: content produced by Danumai Studios, distributed on infrastructure we own and operate ourselves.",
+    accent: "#e11d48",
+    published: true,
+    publishedAt: "2026-07-20T00:00:00.000Z",
+    sortOrder: 1,
   },
 ];
 
@@ -91,11 +121,13 @@ const jobs = [
 
 async function main() {
   for (const p of projects) {
-    // upsert with an empty update leaves existing rows untouched, matching the
-    // old `ON CONFLICT (slug) DO NOTHING` behaviour.
+    // Existing rows are otherwise left untouched (matching the old
+    // `ON CONFLICT (slug) DO NOTHING` behaviour), but we do push a cover image
+    // when the seed provides one — Prisma treats an `undefined` field as "no
+    // change", so projects without an `imageUrl` here are still left alone.
     await prisma.project.upsert({
       where: { slug: p.slug },
-      update: {},
+      update: { imageUrl: "imageUrl" in p ? p.imageUrl : undefined },
       create: p,
     });
   }
@@ -108,8 +140,20 @@ async function main() {
     });
   }
 
+  for (const s of stories) {
+    await prisma.story.upsert({
+      where: { slug: s.slug },
+      update: {},
+      create: {
+        ...s,
+        readMinutes: estimateReadMinutes(s.body),
+        publishedAt: new Date(s.publishedAt),
+      },
+    });
+  }
+
   console.log(
-    `Seeded ${projects.length} projects and ${jobs.length} jobs (existing slugs left untouched).`
+    `Seeded ${projects.length} projects, ${jobs.length} jobs, and ${stories.length} stories (existing slugs left untouched).`
   );
 }
 

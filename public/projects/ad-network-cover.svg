@@ -1,0 +1,99 @@
+<svg width="1280" height="1200" viewBox="0 0 1280 1200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ad Network — vertical video ad delivery, regional targeting and real-time measurement">
+  <defs>
+    <linearGradient id="canvas" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eef2f8"/>
+      <stop offset="1" stop-color="#e4e9f2"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.82" cy="0.14" r="0.85">
+      <stop offset="0" stop-color="#2563eb" stop-opacity="0.22"/>
+      <stop offset="0.55" stop-color="#2563eb" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#2563eb" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="surface" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f4f7fc"/>
+    </linearGradient>
+    <linearGradient id="ad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#1e40af"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#2563eb" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+    <filter id="lift" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="24" stdDeviation="34" flood-color="#1e2540" flood-opacity="0.16"/>
+    </filter>
+    <filter id="liftSm" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="14" stdDeviation="20" flood-color="#1e2540" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+
+  <!-- Backdrop -->
+  <rect width="1280" height="1200" fill="url(#canvas)"/>
+  <rect width="1280" height="1200" fill="url(#glow)"/>
+
+  <!-- Eyebrow + wordmark -->
+  <g transform="translate(100,120)">
+    <circle cx="7" cy="7" r="7" fill="#2563eb"/>
+    <text x="26" y="13" font-family="'Helvetica Neue',Arial,sans-serif" font-size="21" letter-spacing="4" fill="#565b66">AD NETWORK</text>
+    <text x="0" y="90" font-family="Georgia,'Times New Roman',serif" font-size="66" fill="#181920">Monetization for</text>
+    <text x="0" y="164" font-family="Georgia,'Times New Roman',serif" font-size="66" fill="#181920">vertical <tspan fill="#2563eb">streaming</tspan></text>
+  </g>
+
+  <!-- Delivery flow line: advertiser panel → phone -->
+  <path d="M 580 820 C 740 820, 780 620, 820 620" stroke="#2563eb" stroke-width="2.5" stroke-dasharray="2 12" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Regional targeting chip -->
+  <g filter="url(#liftSm)" transform="translate(100,500)">
+    <rect width="340" height="72" rx="36" fill="url(#surface)"/>
+    <rect x="0.5" y="0.5" width="339" height="71" rx="35.5" stroke="#181920" stroke-opacity="0.08"/>
+    <path d="M44 27 C 44 18, 51 11, 60 11 C 69 11, 76 18, 76 27 C 76 38, 60 55, 60 55 C 60 55, 44 38, 44 27 Z" fill="#2563eb"/>
+    <circle cx="60" cy="27" r="6.5" fill="#ffffff"/>
+    <text x="100" y="44" font-family="'Helvetica Neue',Arial,sans-serif" font-size="22" fill="#181920">Regional targeting</text>
+  </g>
+
+  <!-- Advertiser dashboard: real-time measurement -->
+  <g filter="url(#lift)" transform="translate(100,624)">
+    <rect width="490" height="376" rx="30" fill="url(#surface)"/>
+    <rect x="0.5" y="0.5" width="489" height="375" rx="29.5" stroke="#181920" stroke-opacity="0.08"/>
+    <text x="38" y="60" font-family="'Helvetica Neue',Arial,sans-serif" font-size="19" letter-spacing="2.5" fill="#565b66">REAL-TIME MEASUREMENT</text>
+    <text x="38" y="134" font-family="Georgia,serif" font-size="54" fill="#181920">2.4M</text>
+    <text x="176" y="134" font-family="'Helvetica Neue',Arial,sans-serif" font-size="20" fill="#565b66">impressions / day</text>
+    <g transform="translate(38,184)">
+      <line x1="0" y1="136" x2="414" y2="136" stroke="#181920" stroke-opacity="0.08"/>
+      <rect x="0"   y="82" width="40" height="54"  rx="7" fill="url(#bar)"/>
+      <rect x="58"  y="50" width="40" height="86"  rx="7" fill="url(#bar)"/>
+      <rect x="116" y="64" width="40" height="72"  rx="7" fill="url(#bar)"/>
+      <rect x="174" y="22" width="40" height="114" rx="7" fill="url(#bar)"/>
+      <rect x="232" y="44" width="40" height="92"  rx="7" fill="url(#bar)"/>
+      <rect x="290" y="6"  width="40" height="130" rx="7" fill="#2563eb"/>
+      <rect x="348" y="34" width="40" height="102" rx="7" fill="url(#bar)"/>
+    </g>
+  </g>
+
+  <!-- Vertical video ad unit (phone) -->
+  <g filter="url(#lift)" transform="translate(820,165)">
+    <rect width="400" height="900" rx="58" fill="#0f1424"/>
+    <rect x="16" y="16" width="368" height="868" rx="45" fill="url(#ad)"/>
+    <rect x="16" y="16" width="368" height="868" rx="45" fill="#0f1424" opacity="0.14"/>
+    <!-- AD chip -->
+    <rect x="46" y="52" width="78" height="38" rx="19" fill="#ffffff" fill-opacity="0.22"/>
+    <text x="85" y="77" text-anchor="middle" font-family="'Helvetica Neue',Arial,sans-serif" font-size="19" letter-spacing="2" fill="#ffffff">AD</text>
+    <!-- play glyph -->
+    <circle cx="200" cy="430" r="60" fill="#ffffff" fill-opacity="0.16"/>
+    <circle cx="200" cy="430" r="60" stroke="#ffffff" stroke-opacity="0.5" stroke-width="1.5"/>
+    <path d="M184 402 L 232 430 L 184 458 Z" fill="#ffffff"/>
+    <!-- caption lines -->
+    <rect x="46" y="712" width="234" height="18" rx="9" fill="#ffffff" fill-opacity="0.85"/>
+    <rect x="46" y="746" width="166" height="16" rx="8" fill="#ffffff" fill-opacity="0.5"/>
+    <!-- CTA -->
+    <rect x="46" y="790" width="308" height="50" rx="25" fill="#ffffff"/>
+    <text x="200" y="822" text-anchor="middle" font-family="'Helvetica Neue',Arial,sans-serif" font-size="20" font-weight="600" fill="#1e40af">Learn more</text>
+    <!-- progress -->
+    <rect x="46" y="876" width="308" height="5" rx="2.5" fill="#ffffff" fill-opacity="0.25"/>
+    <rect x="46" y="876" width="168" height="5" rx="2.5" fill="#ffffff"/>
+    <!-- notch -->
+    <rect x="166" y="34" width="68" height="9" rx="4.5" fill="#ffffff" fill-opacity="0.35"/>
+  </g>
+</svg>

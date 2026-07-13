@@ -386,7 +386,7 @@ export const DEFAULT_CONTENT: SiteContent = {
     email: "hello@danumai.com",
     location: "Dhaka · Remote",
     socials: [
-      { label: "LinkedIn", href: "https://www.linkedin.com/company/danumai" },
+      { label: "LinkedIn", href: "https://www.linkedin.com/company/banglareels" },
       { label: "X", href: "https://x.com/danumai" },
       { label: "GitHub", href: "https://github.com/danumai" },
       { label: "Instagram", href: "https://www.instagram.com/danumai" },

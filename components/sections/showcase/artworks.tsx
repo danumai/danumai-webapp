@@ -123,7 +123,7 @@ export function StudiosArt() {
             "radial-gradient(55% 60% at 50% 45%, rgba(217,154,78,0.08), transparent 70%)",
         }}
       />
-      <div className="relative h-[52%] w-[70%]">
+      <div className="relative h-[44%] w-[70%]">
         {frames.map((f, i) => (
           <motion.div
             key={f.scene}
@@ -132,11 +132,11 @@ export function StudiosArt() {
             initial={false}
             animate={
               reduce
-                ? { rotate: f.rotate, x: `calc(-50% + ${f.x})` }
+                ? { rotate: f.rotate, x: `calc(-50% + ${f.x})`, y: "-50%" }
                 : {
                     rotate: [f.rotate, f.rotate + 1.2, f.rotate],
                     x: `calc(-50% + ${f.x})`,
-                    y: ["-50%", "-53%", "-50%"],
+                    y: "-50%",
                   }
             }
             transition={{
