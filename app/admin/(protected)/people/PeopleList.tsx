@@ -86,16 +86,41 @@ export default function PeopleList({
 
 function ApplicationsList({ applications }: { applications: Application[] }) {
   const [pending, startTransition] = useTransition();
+  const [job, setJob] = useState("all");
   const toast = useToast();
   const confirm = useConfirm();
+
+  const jobs = Array.from(
+    new Set(applications.map((a) => a.jobTitle || "General application"))
+  ).sort();
+  const filtered =
+    job === "all"
+      ? applications
+      : applications.filter((a) => (a.jobTitle || "General application") === job);
 
   if (applications.length === 0) {
     return <p className="text-sm text-mist">No applications yet.</p>;
   }
 
   return (
+    <div className="space-y-4">
+      <select
+        value={job}
+        onChange={(e) => setJob(e.target.value)}
+        className="rounded-lg bg-copper/10 px-3 py-2 text-sm text-paper"
+      >
+        <option value="all">All jobs ({applications.length})</option>
+        {jobs.map((j) => (
+          <option key={j} value={j}>
+            {j} ({applications.filter((a) => (a.jobTitle || "General application") === j).length})
+          </option>
+        ))}
+      </select>
+      {filtered.length === 0 ? (
+        <p className="text-sm text-mist">No applications for this job.</p>
+      ) : (
     <ul className="space-y-4">
-      {applications.map((a) => (
+      {filtered.map((a) => (
         <li
           key={a.id}
           className={`card p-5 ${a.read ? "opacity-70" : ""}`}
@@ -189,6 +214,8 @@ function ApplicationsList({ applications }: { applications: Application[] }) {
         </li>
       ))}
     </ul>
+      )}
+    </div>
   );
 }
 
