@@ -3,10 +3,15 @@
 import { useState, useTransition } from "react";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
-import type { Application, ContactMessage } from "@/lib/data/submissions";
+import type {
+  Application,
+  ApplicationStatus,
+  ContactMessage,
+} from "@/lib/data/submissions";
 import { linkLabel } from "@/lib/applicationLinks";
 import {
   toggleApplicationReadAction,
+  setApplicationStatusAction,
   deleteApplicationAction,
   toggleContactMessageReadAction,
   deleteContactMessageAction,
@@ -84,24 +89,43 @@ export default function PeopleList({
   );
 }
 
+const VIEWS: { key: ApplicationStatus; label: string }[] = [
+  { key: "active", label: "Active" },
+  { key: "favorite", label: "Top candidates" },
+  { key: "rejected", label: "Rejected" },
+  { key: "trash", label: "Trash" },
+];
+
 function ApplicationsList({ applications }: { applications: Application[] }) {
   const [pending, startTransition] = useTransition();
   const [job, setJob] = useState("all");
+  const [view, setView] = useState<ApplicationStatus>("active");
   const toast = useToast();
   const confirm = useConfirm();
+
+  const setStatus = (a: Application, status: ApplicationStatus, label: string) =>
+    startTransition(async () => {
+      try {
+        await setApplicationStatusAction(a.id, status);
+        toast(`${a.name} → ${label}`, "success");
+      } catch {
+        toast("Couldn't update. Try again.", "error");
+      }
+    });
 
   // applications arrive newest-first; number them oldest = #1, stable across filtering
   const numbers = new Map(
     applications.map((a, i) => [a.id, applications.length - i])
   );
 
+  const inView = applications.filter((a) => a.status === view);
   const jobs = Array.from(
-    new Set(applications.map((a) => a.jobTitle || "General application"))
+    new Set(inView.map((a) => a.jobTitle || "General application"))
   ).sort();
   const filtered =
     job === "all"
-      ? applications
-      : applications.filter((a) => (a.jobTitle || "General application") === job);
+      ? inView
+      : inView.filter((a) => (a.jobTitle || "General application") === job);
 
   if (applications.length === 0) {
     return <p className="text-sm text-mist">No applications yet.</p>;
@@ -109,20 +133,42 @@ function ApplicationsList({ applications }: { applications: Application[] }) {
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap gap-2">
+        {VIEWS.map((v) => {
+          const active = view === v.key;
+          const count = applications.filter((a) => a.status === v.key).length;
+          return (
+            <button
+              key={v.key}
+              type="button"
+              onClick={() => {
+                setView(v.key);
+                setJob("all");
+              }}
+              className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition-colors ${
+                active ? "bg-copper/15 text-copper" : "text-mist hover:text-copper-soft"
+              }`}
+            >
+              {v.label}
+              <span className="text-xs text-faint">{count}</span>
+            </button>
+          );
+        })}
+      </div>
       <select
         value={job}
         onChange={(e) => setJob(e.target.value)}
         className="rounded-lg bg-copper/10 px-3 py-2 text-sm text-paper"
       >
-        <option value="all">All jobs ({applications.length})</option>
+        <option value="all">All jobs ({inView.length})</option>
         {jobs.map((j) => (
           <option key={j} value={j}>
-            {j} ({applications.filter((a) => (a.jobTitle || "General application") === j).length})
+            {j} ({inView.filter((a) => (a.jobTitle || "General application") === j).length})
           </option>
         ))}
       </select>
       {filtered.length === 0 ? (
-        <p className="text-sm text-mist">No applications for this job.</p>
+        <p className="text-sm text-mist">Nothing here.</p>
       ) : (
     <ul className="space-y-4">
       {filtered.map((a) => (
@@ -155,32 +201,79 @@ function ApplicationsList({ applications }: { applications: Application[] }) {
                 {formatDate(a.createdAt)}
               </p>
             </div>
-            <RowActions
-              read={a.read}
-              pending={pending}
-              onToggleRead={() =>
-                startTransition(() =>
-                  toggleApplicationReadAction(a.id, !a.read)
-                )
-              }
-              onDelete={async () => {
-                const ok = await confirm({
-                  title: "Delete application",
-                  message: `Delete application from ${a.name}?`,
-                  confirmLabel: "Delete",
-                  destructive: true,
-                });
-                if (!ok) return;
-                startTransition(async () => {
-                  try {
-                    await deleteApplicationAction(a.id);
-                    toast(`Deleted application from ${a.name}`, "success");
-                  } catch {
-                    toast("Couldn't delete application. Try again.", "error");
-                  }
-                });
-              }}
-            />
+            <div className="flex shrink-0 flex-wrap items-center justify-end gap-3 text-sm">
+              <button
+                onClick={() =>
+                  startTransition(() =>
+                    toggleApplicationReadAction(a.id, !a.read)
+                  )
+                }
+                disabled={pending}
+                className="text-mist hover:text-copper-soft disabled:opacity-50"
+              >
+                {a.read ? "Mark unread" : "Mark read"}
+              </button>
+              {a.status !== "favorite" && (
+                <button
+                  onClick={() => setStatus(a, "favorite", "Top candidates")}
+                  disabled={pending}
+                  className="text-copper hover:text-copper-soft disabled:opacity-50"
+                >
+                  ★ Top candidate
+                </button>
+              )}
+              {a.status !== "rejected" && (
+                <button
+                  onClick={() => setStatus(a, "rejected", "Rejected")}
+                  disabled={pending}
+                  className="text-mist hover:text-copper-soft disabled:opacity-50"
+                >
+                  Reject
+                </button>
+              )}
+              {a.status !== "active" && (
+                <button
+                  onClick={() => setStatus(a, "active", "Active")}
+                  disabled={pending}
+                  className="text-mist hover:text-copper-soft disabled:opacity-50"
+                >
+                  Restore
+                </button>
+              )}
+              {a.status !== "trash" ? (
+                <button
+                  onClick={() => setStatus(a, "trash", "Trash")}
+                  disabled={pending}
+                  className="text-red-400 hover:text-red-300 disabled:opacity-50"
+                >
+                  Trash
+                </button>
+              ) : (
+                <button
+                  onClick={async () => {
+                    const ok = await confirm({
+                      title: "Delete permanently",
+                      message: `Permanently delete application from ${a.name}?`,
+                      confirmLabel: "Delete",
+                      destructive: true,
+                    });
+                    if (!ok) return;
+                    startTransition(async () => {
+                      try {
+                        await deleteApplicationAction(a.id);
+                        toast(`Deleted application from ${a.name}`, "success");
+                      } catch {
+                        toast("Couldn't delete application. Try again.", "error");
+                      }
+                    });
+                  }}
+                  disabled={pending}
+                  className="text-red-400 hover:text-red-300 disabled:opacity-50"
+                >
+                  Delete forever
+                </button>
+              )}
+            </div>
           </div>
           {a.portfolio && (
             <p className="mt-3 break-words text-sm text-mist">

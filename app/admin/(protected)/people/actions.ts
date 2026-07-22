@@ -3,15 +3,26 @@
 import { revalidatePath } from "next/cache";
 import {
   setApplicationRead,
+  setApplicationStatus,
   deleteApplication,
   setContactMessageRead,
   deleteContactMessage,
+  type ApplicationStatus,
 } from "@/lib/data/submissions";
 import { requireAdmin } from "@/lib/auth";
 
 export async function toggleApplicationReadAction(id: string, read: boolean) {
   await requireAdmin();
   await setApplicationRead(id, read);
+  revalidatePath("/admin/people");
+}
+
+export async function setApplicationStatusAction(
+  id: string,
+  status: ApplicationStatus
+) {
+  await requireAdmin();
+  await setApplicationStatus(id, status);
   revalidatePath("/admin/people");
 }
 

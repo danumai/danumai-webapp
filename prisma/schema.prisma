@@ -75,6 +75,8 @@ model Application {
   links     Json     @default("[]")
   note      String   @default("")
   read      Boolean  @default(false)
+  // active | favorite | rejected | trash
+  status    String   @default("active")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@map("applications")

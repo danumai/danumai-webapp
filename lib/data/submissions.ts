@@ -22,8 +22,11 @@ export type Application = {
   links: ApplicationLink[];
   note: string;
   read: boolean;
+  status: ApplicationStatus;
   createdAt: string;
 };
+
+export type ApplicationStatus = "active" | "favorite" | "rejected" | "trash";
 
 function mapApplication(row: ApplicationModel): Application {
   return {
@@ -35,6 +38,7 @@ function mapApplication(row: ApplicationModel): Application {
     links: normalizeApplicationLinks(row.links),
     note: row.note,
     read: row.read,
+    status: (row.status as ApplicationStatus) ?? "active",
     createdAt: row.createdAt.toISOString(),
   };
 }
@@ -83,6 +87,13 @@ export async function listApplications(): Promise<Application[]> {
 
 export async function setApplicationRead(id: string, read: boolean): Promise<void> {
   await prisma.application.update({ where: { id }, data: { read } });
+}
+
+export async function setApplicationStatus(
+  id: string,
+  status: ApplicationStatus
+): Promise<void> {
+  await prisma.application.update({ where: { id }, data: { status } });
 }
 
 export async function deleteApplication(id: string): Promise<void> {
